@@ -1,5 +1,6 @@
 import { Receipt, MapPin, Clock, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 import restaurantLogo from "@/assets/restaurant-logo.png";
 
 const RESTAURANT = {
@@ -13,6 +14,7 @@ const RESTAURANT = {
 };
 
 const Index = () => {
+  const navigate = useNavigate();
   return (
     <div className="flex min-h-screen flex-col items-center bg-background px-5 pb-10 pt-12">
       {/* Logo */}
@@ -43,7 +45,7 @@ const Index = () => {
       </div>
 
       {/* CTA */}
-      <Button variant="cta" size="xl" className="mb-10 w-full max-w-sm">
+      <Button variant="cta" size="xl" className="mb-10 w-full max-w-sm" onClick={() => navigate("/bill")}>
         <Receipt className="mr-2 h-5 w-5" />
         View My Bill
       </Button>
