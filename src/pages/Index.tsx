@@ -1,5 +1,6 @@
 import { Receipt, MapPin, Clock, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 import restaurantLogo from "@/assets/restaurant-logo.png";
 
 const RESTAURANT = {
