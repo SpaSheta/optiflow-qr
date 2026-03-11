@@ -2,24 +2,14 @@ import { ArrowLeft, Split, CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { useNavigate } from "react-router-dom";
-
-const BILL_ITEMS = [
-  { id: 1, name: "Truffle Risotto", qty: 1, price: 28.0 },
-  { id: 2, name: "Grilled Salmon", qty: 1, price: 34.0 },
-  { id: 3, name: "Caesar Salad", qty: 2, price: 14.0 },
-  { id: 4, name: "Sparkling Water", qty: 3, price: 6.5 },
-  { id: 5, name: "Tiramisu", qty: 2, price: 12.0 },
-  { id: 6, name: "Espresso", qty: 2, price: 4.5 },
-];
-
-const TAX_RATE = 0.1;
+import { BILL_ITEMS, TAX_RATE, getSubtotal, getTotal } from "@/data/mock-bill";
 
 const Bill = () => {
   const navigate = useNavigate();
 
-  const subtotal = BILL_ITEMS.reduce((sum, item) => sum + item.qty * item.price, 0);
+  const subtotal = getSubtotal(BILL_ITEMS);
   const tax = subtotal * TAX_RATE;
-  const total = subtotal + tax;
+  const total = getTotal(BILL_ITEMS);
 
   return (
     <div className="flex min-h-screen flex-col bg-background px-5 pb-6 pt-5">
@@ -48,7 +38,6 @@ const Bill = () => {
 
       {/* Items */}
       <div className="mb-4 flex-1 space-y-1">
-        {/* Column headers */}
         <div className="flex items-center px-4 pb-2 text-xs font-medium uppercase tracking-wider text-muted-foreground">
           <span className="flex-1">Item</span>
           <span className="w-10 text-center">Qty</span>
@@ -64,9 +53,7 @@ const Bill = () => {
             <div className="flex-1">
               <span className="text-sm font-medium text-foreground">{item.name}</span>
             </div>
-            <span className="w-10 text-center text-sm text-muted-foreground">
-              {item.qty}
-            </span>
+            <span className="w-10 text-center text-sm text-muted-foreground">{item.qty}</span>
             <span className="w-20 text-right text-sm font-semibold text-foreground">
               €{(item.qty * item.price).toFixed(2)}
             </span>
@@ -93,11 +80,11 @@ const Bill = () => {
 
       {/* Action buttons */}
       <div className="flex gap-3">
-        <Button variant="outline" size="xl" className="flex-1">
+        <Button variant="outline" size="xl" className="flex-1" onClick={() => navigate("/split")}>
           <Split className="mr-2 h-4 w-4" />
           Split Bill
         </Button>
-        <Button variant="cta" size="xl" className="flex-[1.4]">
+        <Button variant="cta" size="xl" className="flex-[1.4]" onClick={() => navigate("/payment")}>
           <CreditCard className="mr-2 h-5 w-5" />
           Pay Now
         </Button>
