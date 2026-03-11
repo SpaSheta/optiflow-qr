@@ -14,6 +14,7 @@ const RESTAURANT = {
 };
 
 const Index = () => {
+  const navigate = useNavigate();
   return (
     <div className="flex min-h-screen flex-col items-center bg-background px-5 pb-10 pt-12">
       {/* Logo */}
