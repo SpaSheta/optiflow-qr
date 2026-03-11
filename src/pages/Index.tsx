@@ -45,7 +45,7 @@ const Index = () => {
       </div>
 
       {/* CTA */}
-      <Button variant="cta" size="xl" className="mb-10 w-full max-w-sm">
+      <Button variant="cta" size="xl" className="mb-10 w-full max-w-sm" onClick={() => navigate("/bill")}>
         <Receipt className="mr-2 h-5 w-5" />
         View My Bill
       </Button>
