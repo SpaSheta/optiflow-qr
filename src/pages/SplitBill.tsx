@@ -1,7 +1,8 @@
-import { useState, useMemo } from "react";
-import { ArrowLeft, Users, ListChecks, PencilLine, ChevronDown } from "lucide-react";
+import { useState } from "react";
+import { ArrowLeft, Users, ListChecks, PencilLine } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { Slider } from "@/components/ui/slider";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useNavigate } from "react-router-dom";
 import { BILL_ITEMS, TAX_RATE, getSubtotal, getTotal } from "@/data/mock-bill";
