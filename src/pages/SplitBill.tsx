@@ -44,9 +44,6 @@ const SplitBill = () => {
           <TabsTrigger value="item" className="flex-1 gap-1.5 text-xs">
             <ListChecks className="h-3.5 w-3.5" /> By Item
           </TabsTrigger>
-          <TabsTrigger value="custom" className="flex-1 gap-1.5 text-xs">
-            <PencilLine className="h-3.5 w-3.5" /> Custom
-          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="equal"><EqualSplit /></TabsContent>
