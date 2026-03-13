@@ -48,7 +48,7 @@ const SplitBill = () => {
 
         <TabsContent value="equal"><EqualSplit /></TabsContent>
         <TabsContent value="item"><ByItemSplit /></TabsContent>
-        <TabsContent value="custom"><CustomSplit /></TabsContent>
+        
       </Tabs>
     </div>
   );
