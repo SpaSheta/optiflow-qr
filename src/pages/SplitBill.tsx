@@ -1,19 +1,20 @@
 import { useState, useMemo } from "react";
-import { ArrowLeft, Users, ListChecks, PencilLine } from "lucide-react";
+import { ArrowLeft, Users, ListChecks, PencilLine, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useNavigate } from "react-router-dom";
-import { BILL_ITEMS, TAX_RATE, getTotal } from "@/data/mock-bill";
+import { BILL_ITEMS, TAX_RATE, getSubtotal, getTotal } from "@/data/mock-bill";
 
 const total = getTotal(BILL_ITEMS);
+const subtotal = getSubtotal(BILL_ITEMS);
+const tax = subtotal * TAX_RATE;
 
 const SplitBill = () => {
   const navigate = useNavigate();
 
   return (
     <div className="flex min-h-screen flex-col bg-background px-5 pb-6 pt-5">
-      {/* Header */}
       <div className="mb-5 flex items-center gap-3">
         <button
           onClick={() => navigate("/bill")}
@@ -34,7 +35,7 @@ const SplitBill = () => {
         <p className="text-2xl font-bold text-foreground">€{total.toFixed(2)}</p>
       </div>
 
-      <Tabs defaultValue="equal" className="flex flex-1 flex-col">
+      <Tabs defaultValue="item" className="flex flex-1 flex-col">
         <TabsList className="mb-4 w-full">
           <TabsTrigger value="equal" className="flex-1 gap-1.5 text-xs">
             <Users className="h-3.5 w-3.5" /> Equal
@@ -59,6 +60,7 @@ const SplitBill = () => {
 const EqualSplit = () => {
   const [people, setPeople] = useState(2);
   const perPerson = total / people;
+  const taxPerPerson = tax / people;
 
   return (
     <div className="flex flex-1 flex-col">
@@ -93,6 +95,10 @@ const EqualSplit = () => {
         ))}
       </div>
 
+      <div className="mt-4 rounded-xl bg-secondary/50 px-4 py-3 text-center text-xs text-muted-foreground">
+        Tax included: <span className="font-semibold text-foreground">€{taxPerPerson.toFixed(2)}</span> per person
+      </div>
+
       <Button variant="cta" size="xl" className="mt-auto pt-4 w-full">
         Confirm Split
       </Button>
@@ -102,18 +108,27 @@ const EqualSplit = () => {
 
 /* ─── By Item Split ─── */
 const ByItemSplit = () => {
-  const [selected, setSelected] = useState<Set<number>>(new Set());
+  // Track selected items and their chosen quantities
+  const [selections, setSelections] = useState<Record<number, number>>({});
 
-  const toggle = (id: number) => {
-    setSelected((prev) => {
-      const next = new Set(prev);
-      next.has(id) ? next.delete(id) : next.add(id);
+  const toggleItem = (id: number) => {
+    setSelections((prev) => {
+      const next = { ...prev };
+      if (id in next) {
+        delete next[id];
+      } else {
+        next[id] = 1;
+      }
       return next;
     });
   };
 
-  const mySubtotal = BILL_ITEMS.filter((i) => selected.has(i.id)).reduce(
-    (s, i) => s + i.qty * i.price,
+  const updateQty = (id: number, qty: number) => {
+    setSelections((prev) => ({ ...prev, [id]: qty }));
+  };
+
+  const mySubtotal = BILL_ITEMS.filter((i) => i.id in selections).reduce(
+    (s, i) => s + (selections[i.id] ?? 1) * i.price,
     0
   );
   const myTotal = mySubtotal + mySubtotal * TAX_RATE;
@@ -123,31 +138,58 @@ const ByItemSplit = () => {
       <p className="mb-3 text-xs text-muted-foreground">Select items you're paying for:</p>
       <div className="space-y-1.5">
         {BILL_ITEMS.map((item) => {
-          const checked = selected.has(item.id);
+          const isSelected = item.id in selections;
+          const selectedQty = selections[item.id] ?? 1;
+          const displayPrice = isSelected ? selectedQty * item.price : item.qty * item.price;
+
           return (
-            <button
-              key={item.id}
-              onClick={() => toggle(item.id)}
-              className={`flex w-full items-center rounded-xl px-4 py-3 ring-1 transition-all ${
-                checked
-                  ? "bg-primary/5 ring-primary"
-                  : "bg-card ring-border"
-              }`}
-            >
-              <div
-                className={`mr-3 flex h-5 w-5 items-center justify-center rounded-md border-2 transition-colors ${
-                  checked ? "border-primary bg-primary" : "border-muted-foreground/30"
+            <div key={item.id}>
+              <button
+                onClick={() => toggleItem(item.id)}
+                className={`flex w-full items-center rounded-xl px-4 py-3 ring-1 transition-all ${
+                  isSelected ? "bg-primary/5 ring-primary" : "bg-card ring-border"
                 }`}
               >
-                {checked && (
-                  <svg className="h-3 w-3 text-primary-foreground" viewBox="0 0 12 12" fill="none">
-                    <path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                )}
-              </div>
-              <span className="flex-1 text-left text-sm font-medium text-foreground">{item.name}</span>
-              <span className="text-sm text-muted-foreground">€{(item.qty * item.price).toFixed(2)}</span>
-            </button>
+                {/* Radio circle */}
+                <div
+                  className={`mr-3 flex h-5 w-5 items-center justify-center rounded-full border-2 transition-colors ${
+                    isSelected ? "border-primary bg-primary" : "border-muted-foreground/30"
+                  }`}
+                >
+                  {isSelected && (
+                    <div className="h-2 w-2 rounded-full bg-primary-foreground" />
+                  )}
+                </div>
+                <span className="flex-1 text-left text-sm font-medium text-foreground">
+                  {item.name}
+                  {item.qty > 1 && (
+                    <span className="ml-1 text-xs text-muted-foreground">×{item.qty}</span>
+                  )}
+                </span>
+                <span className="text-sm text-muted-foreground">
+                  €{displayPrice.toFixed(2)}
+                </span>
+              </button>
+
+              {/* Quantity dropdown for multi-qty items */}
+              {isSelected && item.qty > 1 && (
+                <div className="ml-12 mt-1 flex items-center gap-2 rounded-lg bg-secondary/50 px-3 py-2 text-xs text-muted-foreground">
+                  <span>How many did you have?</span>
+                  <div className="relative">
+                    <select
+                      value={selectedQty}
+                      onChange={(e) => updateQty(item.id, parseInt(e.target.value))}
+                      className="appearance-none rounded-md bg-card py-1 pl-2 pr-6 text-xs font-semibold text-foreground ring-1 ring-border focus:outline-none focus:ring-primary"
+                    >
+                      {Array.from({ length: item.qty }, (_, i) => i + 1).map((n) => (
+                        <option key={n} value={n}>{n}</option>
+                      ))}
+                    </select>
+                    <ChevronDown className="pointer-events-none absolute right-1 top-1/2 h-3 w-3 -translate-y-1/2 text-muted-foreground" />
+                  </div>
+                </div>
+              )}
+            </div>
           );
         })}
       </div>
@@ -158,7 +200,12 @@ const ByItemSplit = () => {
         <span>€{myTotal.toFixed(2)}</span>
       </div>
 
-      <Button variant="cta" size="xl" className="mt-4 w-full" disabled={selected.size === 0}>
+      <Button
+        variant="cta"
+        size="xl"
+        className="mt-4 w-full"
+        disabled={Object.keys(selections).length === 0}
+      >
         Pay My Share
       </Button>
     </div>
@@ -167,61 +214,45 @@ const ByItemSplit = () => {
 
 /* ─── Custom Split ─── */
 const CustomSplit = () => {
-  const [amounts, setAmounts] = useState<Record<string, string>>({ "Person 1": "", "Person 2": "" });
-  const people = Object.keys(amounts);
-
-  const addPerson = () => {
-    setAmounts((prev) => ({ ...prev, [`Person ${people.length + 1}`]: "" }));
-  };
-
-  const updateAmount = (name: string, val: string) => {
-    setAmounts((prev) => ({ ...prev, [name]: val }));
-  };
-
-  const assigned = Object.values(amounts).reduce((s, v) => s + (parseFloat(v) || 0), 0);
-  const remaining = total - assigned;
+  const [amount, setAmount] = useState("");
+  const myAmount = parseFloat(amount) || 0;
+  const remaining = total - myAmount;
 
   return (
     <div className="flex flex-1 flex-col">
-      <div className="space-y-2">
-        {people.map((name) => (
-          <div key={name} className="flex items-center gap-3 rounded-xl bg-card px-4 py-3 ring-1 ring-border">
-            <span className="flex-1 text-sm text-foreground">{name}</span>
-            <div className="flex items-center gap-1">
-              <span className="text-sm text-muted-foreground">€</span>
-              <input
-                type="number"
-                min="0"
-                step="0.01"
-                value={amounts[name]}
-                onChange={(e) => updateAmount(name, e.target.value)}
-                placeholder="0.00"
-                className="w-20 bg-transparent text-right text-sm font-semibold text-foreground outline-none placeholder:text-muted-foreground/50"
-              />
-            </div>
-          </div>
-        ))}
+      <div className="rounded-xl bg-card px-4 py-4 ring-1 ring-border">
+        <label className="mb-2 block text-xs text-muted-foreground">Enter your amount</label>
+        <div className="flex items-center gap-1">
+          <span className="text-lg font-semibold text-muted-foreground">€</span>
+          <input
+            type="number"
+            min="0"
+            step="0.01"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+            placeholder="0.00"
+            className="w-full bg-transparent text-2xl font-bold text-foreground outline-none placeholder:text-muted-foreground/40"
+          />
+        </div>
       </div>
-
-      <button
-        onClick={addPerson}
-        className="mt-3 text-sm font-medium text-primary hover:underline"
-      >
-        + Add person
-      </button>
 
       <Separator className="my-4" />
       <div className="flex justify-between text-sm text-muted-foreground">
-        <span>Assigned</span>
-        <span>€{assigned.toFixed(2)}</span>
+        <span>Bill total</span>
+        <span>€{total.toFixed(2)}</span>
       </div>
-      <div className={`mt-1 flex justify-between text-sm font-semibold ${remaining < 0 ? "text-destructive" : "text-foreground"}`}>
-        <span>Remaining</span>
+      <div className={`mt-2 flex justify-between text-sm font-semibold ${remaining < 0 ? "text-destructive" : "text-foreground"}`}>
+        <span>Remaining for others</span>
         <span>€{remaining.toFixed(2)}</span>
       </div>
 
-      <Button variant="cta" size="xl" className="mt-4 w-full" disabled={Math.abs(remaining) > 0.01}>
-        Confirm Split
+      <Button
+        variant="cta"
+        size="xl"
+        className="mt-auto pt-4 w-full"
+        disabled={myAmount <= 0 || myAmount > total}
+      >
+        Pay €{myAmount.toFixed(2)}
       </Button>
     </div>
   );
