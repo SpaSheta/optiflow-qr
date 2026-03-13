@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowLeft, Users, ListChecks, PencilLine } from "lucide-react";
+import { ArrowLeft, Users, ListChecks } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Slider } from "@/components/ui/slider";
