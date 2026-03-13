@@ -212,9 +212,19 @@ const ByItemSplit = () => {
       </div>
 
       <Separator className="my-4" />
-      <div className="flex justify-between text-lg font-bold text-foreground">
-        <span>Your total</span>
-        <span>€{myTotal.toFixed(2)}</span>
+      <div className="space-y-1">
+        <div className="flex justify-between text-xs text-muted-foreground">
+          <span>Items subtotal</span>
+          <span>€{mySubtotal.toFixed(2)}</span>
+        </div>
+        <div className="flex justify-between text-xs text-muted-foreground">
+          <span>Tax (split ÷ {people})</span>
+          <span>€{myTax.toFixed(2)}</span>
+        </div>
+        <div className="flex justify-between text-lg font-bold text-foreground">
+          <span>Your total</span>
+          <span>€{myTotal.toFixed(2)}</span>
+        </div>
       </div>
 
       <Button
