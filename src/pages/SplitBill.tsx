@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowLeft, Users, ListChecks, PencilLine } from "lucide-react";
+import { ArrowLeft, Users, ListChecks } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Slider } from "@/components/ui/slider";
@@ -44,14 +44,11 @@ const SplitBill = () => {
           <TabsTrigger value="item" className="flex-1 gap-1.5 text-xs">
             <ListChecks className="h-3.5 w-3.5" /> By Item
           </TabsTrigger>
-          <TabsTrigger value="custom" className="flex-1 gap-1.5 text-xs">
-            <PencilLine className="h-3.5 w-3.5" /> Custom
-          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="equal"><EqualSplit /></TabsContent>
         <TabsContent value="item"><ByItemSplit /></TabsContent>
-        <TabsContent value="custom"><CustomSplit /></TabsContent>
+        
       </Tabs>
     </div>
   );
@@ -234,52 +231,6 @@ const ByItemSplit = () => {
         disabled={Object.keys(selections).length === 0}
       >
         Pay My Share
-      </Button>
-    </div>
-  );
-};
-
-/* ─── Custom Split ─── */
-const CustomSplit = () => {
-  const [amount, setAmount] = useState("");
-  const myAmount = parseFloat(amount) || 0;
-  const remaining = total - myAmount;
-
-  return (
-    <div className="flex flex-1 flex-col">
-      <div className="rounded-xl bg-card px-4 py-4 ring-1 ring-border">
-        <label className="mb-2 block text-xs text-muted-foreground">Enter your amount</label>
-        <div className="flex items-center gap-1">
-          <span className="text-lg font-semibold text-muted-foreground">€</span>
-          <input
-            type="number"
-            min="0"
-            step="0.01"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-            placeholder="0.00"
-            className="w-full bg-transparent text-2xl font-bold text-foreground outline-none placeholder:text-muted-foreground/40"
-          />
-        </div>
-      </div>
-
-      <Separator className="my-4" />
-      <div className="flex justify-between text-sm text-muted-foreground">
-        <span>Bill total</span>
-        <span>€{total.toFixed(2)}</span>
-      </div>
-      <div className={`mt-2 flex justify-between text-sm font-semibold ${remaining < 0 ? "text-destructive" : "text-foreground"}`}>
-        <span>Remaining for others</span>
-        <span>€{remaining.toFixed(2)}</span>
-      </div>
-
-      <Button
-        variant="cta"
-        size="xl"
-        className="mt-auto pt-4 w-full"
-        disabled={myAmount <= 0 || myAmount > total}
-      >
-        Pay €{myAmount.toFixed(2)}
       </Button>
     </div>
   );
