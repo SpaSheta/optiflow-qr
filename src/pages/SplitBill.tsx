@@ -133,10 +133,28 @@ const ByItemSplit = () => {
     (s, i) => s + (selections[i.id] ?? 1) * i.price,
     0
   );
-  const myTotal = mySubtotal + mySubtotal * TAX_RATE;
+  const totalTax = getSubtotal(BILL_ITEMS) * TAX_RATE;
+  const myTax = totalTax / people;
+  const myTotal = mySubtotal + myTax;
 
   return (
     <div className="flex flex-1 flex-col">
+      {/* Person count */}
+      <div className="mb-4 flex items-center justify-between rounded-xl bg-card px-4 py-3 ring-1 ring-border">
+        <span className="text-sm text-muted-foreground">People at table</span>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setPeople(Math.max(1, people - 1))}
+            className="flex h-7 w-7 items-center justify-center rounded-lg bg-secondary text-sm font-bold text-secondary-foreground"
+          >−</button>
+          <span className="w-5 text-center text-lg font-bold text-foreground">{people}</span>
+          <button
+            onClick={() => setPeople(people + 1)}
+            className="flex h-7 w-7 items-center justify-center rounded-lg bg-secondary text-sm font-bold text-secondary-foreground"
+          >+</button>
+        </div>
+      </div>
+
       <p className="mb-3 text-xs text-muted-foreground">Select items you're paying for:</p>
       <div className="space-y-1.5">
         {BILL_ITEMS.map((item) => {
