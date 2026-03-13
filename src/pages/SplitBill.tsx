@@ -1,7 +1,8 @@
-import { useState, useMemo } from "react";
-import { ArrowLeft, Users, ListChecks, PencilLine, ChevronDown } from "lucide-react";
+import { useState } from "react";
+import { ArrowLeft, Users, ListChecks, PencilLine } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { Slider } from "@/components/ui/slider";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useNavigate } from "react-router-dom";
 import { BILL_ITEMS, TAX_RATE, getSubtotal, getTotal } from "@/data/mock-bill";
@@ -108,6 +109,7 @@ const EqualSplit = () => {
 
 /* ─── By Item Split ─── */
 const ByItemSplit = () => {
+  const [people, setPeople] = useState(2);
   // Track selected items and their chosen quantities
   const [selections, setSelections] = useState<Record<number, number>>({});
 
@@ -131,10 +133,28 @@ const ByItemSplit = () => {
     (s, i) => s + (selections[i.id] ?? 1) * i.price,
     0
   );
-  const myTotal = mySubtotal + mySubtotal * TAX_RATE;
+  const totalTax = getSubtotal(BILL_ITEMS) * TAX_RATE;
+  const myTax = totalTax / people;
+  const myTotal = mySubtotal + myTax;
 
   return (
     <div className="flex flex-1 flex-col">
+      {/* Person count */}
+      <div className="mb-4 flex items-center justify-between rounded-xl bg-card px-4 py-3 ring-1 ring-border">
+        <span className="text-sm text-muted-foreground">People at table</span>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setPeople(Math.max(1, people - 1))}
+            className="flex h-7 w-7 items-center justify-center rounded-lg bg-secondary text-sm font-bold text-secondary-foreground"
+          >−</button>
+          <span className="w-5 text-center text-lg font-bold text-foreground">{people}</span>
+          <button
+            onClick={() => setPeople(people + 1)}
+            className="flex h-7 w-7 items-center justify-center rounded-lg bg-secondary text-sm font-bold text-secondary-foreground"
+          >+</button>
+        </div>
+      </div>
+
       <p className="mb-3 text-xs text-muted-foreground">Select items you're paying for:</p>
       <div className="space-y-1.5">
         {BILL_ITEMS.map((item) => {
@@ -171,22 +191,19 @@ const ByItemSplit = () => {
                 </span>
               </button>
 
-              {/* Quantity dropdown for multi-qty items */}
+              {/* Quantity slider for multi-qty items */}
               {isSelected && item.qty > 1 && (
-                <div className="ml-12 mt-1 flex items-center gap-2 rounded-lg bg-secondary/50 px-3 py-2 text-xs text-muted-foreground">
-                  <span>How many did you have?</span>
-                  <div className="relative">
-                    <select
-                      value={selectedQty}
-                      onChange={(e) => updateQty(item.id, parseInt(e.target.value))}
-                      className="appearance-none rounded-md bg-card py-1 pl-2 pr-6 text-xs font-semibold text-foreground ring-1 ring-border focus:outline-none focus:ring-primary"
-                    >
-                      {Array.from({ length: item.qty }, (_, i) => i + 1).map((n) => (
-                        <option key={n} value={n}>{n}</option>
-                      ))}
-                    </select>
-                    <ChevronDown className="pointer-events-none absolute right-1 top-1/2 h-3 w-3 -translate-y-1/2 text-muted-foreground" />
-                  </div>
+                <div className="ml-12 mt-1 flex items-center gap-3 rounded-lg bg-secondary/50 px-3 py-2.5 text-xs text-muted-foreground">
+                  <span className="shrink-0">How many did you have?</span>
+                  <Slider
+                    min={1}
+                    max={item.qty}
+                    step={1}
+                    value={[selectedQty]}
+                    onValueChange={([v]) => updateQty(item.id, v)}
+                    className="flex-1"
+                  />
+                  <span className="w-4 text-center font-semibold text-foreground">{selectedQty}</span>
                 </div>
               )}
             </div>
@@ -195,9 +212,19 @@ const ByItemSplit = () => {
       </div>
 
       <Separator className="my-4" />
-      <div className="flex justify-between text-lg font-bold text-foreground">
-        <span>Your total</span>
-        <span>€{myTotal.toFixed(2)}</span>
+      <div className="space-y-1">
+        <div className="flex justify-between text-xs text-muted-foreground">
+          <span>Items subtotal</span>
+          <span>€{mySubtotal.toFixed(2)}</span>
+        </div>
+        <div className="flex justify-between text-xs text-muted-foreground">
+          <span>Tax (split ÷ {people})</span>
+          <span>€{myTax.toFixed(2)}</span>
+        </div>
+        <div className="flex justify-between text-lg font-bold text-foreground">
+          <span>Your total</span>
+          <span>€{myTotal.toFixed(2)}</span>
+        </div>
       </div>
 
       <Button
