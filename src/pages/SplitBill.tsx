@@ -109,6 +109,7 @@ const EqualSplit = () => {
 
 /* ─── By Item Split ─── */
 const ByItemSplit = () => {
+  const [people, setPeople] = useState(2);
   // Track selected items and their chosen quantities
   const [selections, setSelections] = useState<Record<number, number>>({});
 
