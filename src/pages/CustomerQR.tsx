@@ -272,7 +272,7 @@ const CustomerQR = () => {
         <h1 className="mb-0.5 text-2xl font-bold" style={{ color: secondaryColor, fontFamily }}>
           {restaurant?.name}
         </h1>
-        <p className="text-sm" style={{ color: `${secondaryColor}99` }}>Table {tableNumber}</p>
+        <p className="text-sm" style={{ color: `${secondaryColor}99` }}>Table {table?.table_number}</p>
       </header>
 
       {/* STICKY TAB BAR */}
