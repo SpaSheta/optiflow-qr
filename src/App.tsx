@@ -4,8 +4,9 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { RestaurantProvider } from "@/contexts/RestaurantContext";
-import ProtectedRoute from "@/components/ProtectedRoute";
+import ProtectedRoute, { SuperAdminRoute } from "@/components/ProtectedRoute";
 import DashboardLayout from "@/components/DashboardLayout";
+import SuperAdminLayout from "@/components/SuperAdminLayout";
 
 import Login from "@/pages/Login";
 import Dashboard from "@/pages/Dashboard";
@@ -17,6 +18,11 @@ import DashboardSettings from "@/pages/DashboardSettings";
 import CustomerQR from "@/pages/CustomerQR";
 import CustomerSplit from "@/pages/CustomerSplit";
 import CustomerPay from "@/pages/CustomerPay";
+import SuperAdminOverview from "@/pages/SuperAdminOverview";
+import SuperAdminRestaurants from "@/pages/SuperAdminRestaurants";
+import SuperAdminRestaurantNew from "@/pages/SuperAdminRestaurantNew";
+import SuperAdminRestaurantDetail from "@/pages/SuperAdminRestaurantDetail";
+import SuperAdminRestaurantTables from "@/pages/SuperAdminRestaurantTables";
 import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -34,6 +40,21 @@ const App = () => (
             <Route path="/r/:slug/t/:tableNumber" element={<CustomerQR />} />
             <Route path="/r/:slug/t/:tableNumber/split" element={<CustomerSplit />} />
             <Route path="/r/:slug/t/:tableNumber/pay" element={<CustomerPay />} />
+
+            {/* Super Admin */}
+            <Route
+              element={
+                <SuperAdminRoute>
+                  <SuperAdminLayout />
+                </SuperAdminRoute>
+              }
+            >
+              <Route path="/super-admin" element={<SuperAdminOverview />} />
+              <Route path="/super-admin/restaurants" element={<SuperAdminRestaurants />} />
+              <Route path="/super-admin/restaurants/new" element={<SuperAdminRestaurantNew />} />
+              <Route path="/super-admin/restaurants/:id" element={<SuperAdminRestaurantDetail />} />
+              <Route path="/super-admin/restaurants/:id/tables" element={<SuperAdminRestaurantTables />} />
+            </Route>
 
             {/* Protected dashboard with shared layout */}
             <Route
