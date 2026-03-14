@@ -7,6 +7,7 @@ interface RestaurantContextValue {
   user: User | null;
   restaurant: Restaurant | null;
   theme: RestaurantTheme | null;
+  isSuperAdmin: boolean;
   isLoading: boolean;
   error: string | null;
   refetch: () => Promise<void>;
@@ -16,6 +17,7 @@ const RestaurantContext = createContext<RestaurantContextValue>({
   user: null,
   restaurant: null,
   theme: null,
+  isSuperAdmin: false,
   isLoading: true,
   error: null,
   refetch: async () => {},
@@ -27,13 +29,32 @@ export const RestaurantProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
   const [theme, setTheme] = useState<RestaurantTheme | null>(null);
+  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchRestaurant = async (userId: string) => {
+  const fetchUserData = async (userId: string) => {
     setIsLoading(true);
     setError(null);
     try {
+      // Check if super admin
+      const { data: saData } = await supabase
+        .from("super_admins")
+        .select("id")
+        .eq("user_id", userId)
+        .maybeSingle();
+
+      if (saData) {
+        setIsSuperAdmin(true);
+        setRestaurant(null);
+        setTheme(null);
+        setIsLoading(false);
+        return;
+      }
+
+      setIsSuperAdmin(false);
+
+      // Regular restaurant owner flow
       const { data: rest, error: restErr } = await supabase
         .from("restaurants")
         .select("*")
@@ -59,7 +80,7 @@ export const RestaurantProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const refetch = async () => {
-    if (user) await fetchRestaurant(user.id);
+    if (user) await fetchUserData(user.id);
   };
 
   useEffect(() => {
@@ -68,10 +89,11 @@ export const RestaurantProvider = ({ children }: { children: ReactNode }) => {
         const u = session?.user ?? null;
         setUser(u);
         if (u) {
-          fetchRestaurant(u.id);
+          fetchUserData(u.id);
         } else {
           setRestaurant(null);
           setTheme(null);
+          setIsSuperAdmin(false);
           setIsLoading(false);
         }
       }
@@ -81,7 +103,7 @@ export const RestaurantProvider = ({ children }: { children: ReactNode }) => {
       const u = session?.user ?? null;
       setUser(u);
       if (u) {
-        fetchRestaurant(u.id);
+        fetchUserData(u.id);
       } else {
         setIsLoading(false);
       }
@@ -91,7 +113,7 @@ export const RestaurantProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   return (
-    <RestaurantContext.Provider value={{ user, restaurant, theme, isLoading, error, refetch }}>
+    <RestaurantContext.Provider value={{ user, restaurant, theme, isSuperAdmin, isLoading, error, refetch }}>
       {children}
     </RestaurantContext.Provider>
   );

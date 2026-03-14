@@ -12,6 +12,12 @@ export interface Restaurant {
   currency: string;
   tax_rate: number;
   is_active: boolean;
+  status: string | null;
+  plan: string | null;
+  created_by_super_admin: boolean | null;
+  notes: string | null;
+  contact_name: string | null;
+  contact_phone: string | null;
   created_at: string;
   updated_at: string;
 }
