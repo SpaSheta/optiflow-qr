@@ -8,47 +8,47 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 60 14% 95%;
-    --foreground: 30 10% 12%;
+    --background: 200 10% 96%;
+    --foreground: 180 8% 12%;
 
     --card: 0 0% 100%;
-    --card-foreground: 30 10% 12%;
+    --card-foreground: 180 8% 12%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 30 10% 12%;
+    --popover-foreground: 180 8% 12%;
 
-    --primary: 37 90% 55%;
-    --primary-foreground: 0 0% 100%;
+    --primary: 174 72% 48%;
+    --primary-foreground: 180 20% 8%;
 
-    --secondary: 40 12% 91%;
-    --secondary-foreground: 30 10% 20%;
+    --secondary: 174 20% 92%;
+    --secondary-foreground: 180 10% 20%;
 
-    --muted: 40 10% 93%;
-    --muted-foreground: 30 8% 48%;
+    --muted: 180 8% 93%;
+    --muted-foreground: 180 6% 48%;
 
-    --accent: 37 90% 55%;
-    --accent-foreground: 0 0% 100%;
+    --accent: 174 72% 48%;
+    --accent-foreground: 180 20% 8%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 30 15% 88%;
-    --input: 30 15% 88%;
-    --ring: 36 80% 50%;
+    --border: 180 12% 88%;
+    --input: 180 12% 88%;
+    --ring: 174 72% 48%;
 
     --radius: 0.75rem;
 
     --restaurant-name: 'Playfair Display', serif;
     --body-font: 'DM Sans', sans-serif;
 
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-background: 180 12% 8%;
+    --sidebar-foreground: 174 40% 85%;
+    --sidebar-primary: 174 72% 55%;
+    --sidebar-primary-foreground: 180 20% 8%;
+    --sidebar-accent: 180 15% 14%;
+    --sidebar-accent-foreground: 174 40% 85%;
+    --sidebar-border: 180 12% 16%;
+    --sidebar-ring: 174 72% 48%;
   }
 
   .dark {
