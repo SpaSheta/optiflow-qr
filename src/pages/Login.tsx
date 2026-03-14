@@ -27,9 +27,17 @@ const Login = () => {
         if (error) throw error;
         toast.success("Check your email to confirm your account!");
       } else {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        const { error, data: signInData } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
-        navigate("/dashboard");
+
+        // Check if super admin
+        const { data: saData } = await supabase
+          .from("super_admins")
+          .select("id")
+          .eq("user_id", signInData.user.id)
+          .maybeSingle();
+
+        navigate(saData ? "/super-admin" : "/dashboard");
       }
     } catch (err: any) {
       toast.error(err.message);
