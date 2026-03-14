@@ -15,6 +15,8 @@ import DashboardMenu from "@/pages/DashboardMenu";
 import DashboardTheme from "@/pages/DashboardTheme";
 import DashboardSettings from "@/pages/DashboardSettings";
 import CustomerQR from "@/pages/CustomerQR";
+import CustomerSplit from "@/pages/CustomerSplit";
+import CustomerPay from "@/pages/CustomerPay";
 import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -30,6 +32,8 @@ const App = () => (
             {/* Public */}
             <Route path="/login" element={<Login />} />
             <Route path="/r/:slug/t/:tableNumber" element={<CustomerQR />} />
+            <Route path="/r/:slug/t/:tableNumber/split" element={<CustomerSplit />} />
+            <Route path="/r/:slug/t/:tableNumber/pay" element={<CustomerPay />} />
 
             {/* Protected dashboard with shared layout */}
             <Route
