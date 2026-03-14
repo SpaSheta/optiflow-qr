@@ -19,7 +19,8 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
-import { Plus, Download, Copy, RefreshCw } from "lucide-react";
+import { Plus, Download, Copy, RefreshCw, Printer } from "lucide-react";
+import PrintableQRCard from "@/components/PrintableQRCard";
 import { useNavigate } from "react-router-dom";
 import QRCode from "qrcode";
 
