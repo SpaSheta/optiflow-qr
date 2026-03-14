@@ -279,6 +279,18 @@ const DashboardTables = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <PrintableQRCard
+        open={printOpen}
+        onOpenChange={setPrintOpen}
+        tables={tables.map((t) => ({
+          id: t.id,
+          table_number: t.table_number,
+          label: t.label,
+          qrDataUrl: qrDataUrls[t.id],
+        }))}
+        restaurantName={restaurant?.name ?? "Restaurant"}
+      />
     </div>
   );
 };
