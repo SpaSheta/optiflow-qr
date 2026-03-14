@@ -42,12 +42,14 @@ const DashboardLayout = () => {
   const sidebar = (
     <div className="flex h-full flex-col">
       {/* Logo */}
-      <div className="flex h-14 items-center gap-2 border-b border-sidebar-border px-4">
+      <div className="flex h-14 items-center gap-2.5 border-b border-sidebar-border px-4">
+        <img src={optiflowIcon} alt="OptiFlow" className="h-7 w-7" />
         <span
           className="text-lg font-bold text-sidebar-foreground"
           style={{ fontFamily: "var(--restaurant-name)" }}
         >
           OptiFlow
+        </span>
         </span>
         <button
           className="ml-auto md:hidden"
