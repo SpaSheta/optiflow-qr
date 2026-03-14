@@ -37,9 +37,9 @@ const App = () => (
           <Routes>
             {/* Public */}
             <Route path="/login" element={<Login />} />
-            <Route path="/r/:slug/t/:tableNumber" element={<CustomerQR />} />
-            <Route path="/r/:slug/t/:tableNumber/split" element={<CustomerSplit />} />
-            <Route path="/r/:slug/t/:tableNumber/pay" element={<CustomerPay />} />
+            <Route path="/r/:slug/t/:token" element={<CustomerQR />} />
+            <Route path="/r/:slug/t/:token/split" element={<CustomerSplit />} />
+            <Route path="/r/:slug/t/:token/pay" element={<CustomerPay />} />
 
             {/* Super Admin */}
             <Route
