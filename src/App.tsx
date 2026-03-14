@@ -3,13 +3,18 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import Index from "./pages/Index.tsx";
-import Bill from "./pages/Bill.tsx";
-import SplitBill from "./pages/SplitBill.tsx";
-import Payment from "./pages/Payment.tsx";
-import Admin from "./pages/Admin.tsx";
-import Customize from "./pages/Customize.tsx";
-import NotFound from "./pages/NotFound.tsx";
+import { RestaurantProvider } from "@/contexts/RestaurantContext";
+import ProtectedRoute from "@/components/ProtectedRoute";
+
+import Login from "@/pages/Login";
+import Dashboard from "@/pages/Dashboard";
+import DashboardTables from "@/pages/DashboardTables";
+import DashboardBills from "@/pages/DashboardBills";
+import DashboardMenu from "@/pages/DashboardMenu";
+import DashboardTheme from "@/pages/DashboardTheme";
+import DashboardSettings from "@/pages/DashboardSettings";
+import CustomerQR from "@/pages/CustomerQR";
+import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
 
@@ -18,18 +23,27 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/bill" element={<Bill />} />
-          <Route path="/split" element={<SplitBill />} />
-          <Route path="/payment" element={<Payment />} />
-          <Route path="/admin" element={<Admin />} />
-          <Route path="/customize" element={<Customize />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
+      <RestaurantProvider>
+        <BrowserRouter>
+          <Routes>
+            {/* Public */}
+            <Route path="/login" element={<Login />} />
+            <Route path="/r/:slug/t/:tableNumber" element={<CustomerQR />} />
+
+            {/* Protected dashboard */}
+            <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+            <Route path="/dashboard/tables" element={<ProtectedRoute><DashboardTables /></ProtectedRoute>} />
+            <Route path="/dashboard/bills/:tableId" element={<ProtectedRoute><DashboardBills /></ProtectedRoute>} />
+            <Route path="/dashboard/menu" element={<ProtectedRoute><DashboardMenu /></ProtectedRoute>} />
+            <Route path="/dashboard/theme" element={<ProtectedRoute><DashboardTheme /></ProtectedRoute>} />
+            <Route path="/dashboard/settings" element={<ProtectedRoute><DashboardSettings /></ProtectedRoute>} />
+
+            {/* Redirect root to login */}
+            <Route path="/" element={<Login />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </RestaurantProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );
