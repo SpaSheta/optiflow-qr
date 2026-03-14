@@ -262,7 +262,10 @@ export type Database = {
       restaurants: {
         Row: {
           address: string | null
+          contact_name: string | null
+          contact_phone: string | null
           created_at: string | null
+          created_by_super_admin: boolean | null
           currency: string | null
           email: string | null
           facebook: string | null
@@ -270,16 +273,22 @@ export type Database = {
           instagram: string | null
           is_active: boolean | null
           name: string
+          notes: string | null
           owner_user_id: string | null
           phone: string | null
+          plan: string | null
           slug: string
+          status: string | null
           tax_rate: number | null
           updated_at: string | null
           website: string | null
         }
         Insert: {
           address?: string | null
+          contact_name?: string | null
+          contact_phone?: string | null
           created_at?: string | null
+          created_by_super_admin?: boolean | null
           currency?: string | null
           email?: string | null
           facebook?: string | null
@@ -287,16 +296,22 @@ export type Database = {
           instagram?: string | null
           is_active?: boolean | null
           name: string
+          notes?: string | null
           owner_user_id?: string | null
           phone?: string | null
+          plan?: string | null
           slug: string
+          status?: string | null
           tax_rate?: number | null
           updated_at?: string | null
           website?: string | null
         }
         Update: {
           address?: string | null
+          contact_name?: string | null
+          contact_phone?: string | null
           created_at?: string | null
+          created_by_super_admin?: boolean | null
           currency?: string | null
           email?: string | null
           facebook?: string | null
@@ -304,14 +319,83 @@ export type Database = {
           instagram?: string | null
           is_active?: boolean | null
           name?: string
+          notes?: string | null
           owner_user_id?: string | null
           phone?: string | null
+          plan?: string | null
           slug?: string
+          status?: string | null
           tax_rate?: number | null
           updated_at?: string | null
           website?: string | null
         }
         Relationships: []
+      }
+      super_admins: {
+        Row: {
+          created_at: string | null
+          email: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          email?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      table_qr_tokens: {
+        Row: {
+          created_at: string | null
+          id: string
+          qr_url: string | null
+          regenerated_at: string | null
+          restaurant_id: string | null
+          table_id: string | null
+          token: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          qr_url?: string | null
+          regenerated_at?: string | null
+          restaurant_id?: string | null
+          table_id?: string | null
+          token?: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          qr_url?: string | null
+          regenerated_at?: string | null
+          restaurant_id?: string | null
+          table_id?: string | null
+          token?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "table_qr_tokens_restaurant_id_fkey"
+            columns: ["restaurant_id"]
+            isOneToOne: false
+            referencedRelation: "restaurants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "table_qr_tokens_table_id_fkey"
+            columns: ["table_id"]
+            isOneToOne: true
+            referencedRelation: "tables"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       tables: {
         Row: {
@@ -412,6 +496,7 @@ export type Database = {
     }
     Functions: {
       get_user_restaurant_ids: { Args: { _user_id: string }; Returns: string[] }
+      is_super_admin: { Args: never; Returns: boolean }
     }
     Enums: {
       [_ in never]: never
