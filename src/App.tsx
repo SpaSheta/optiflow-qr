@@ -15,6 +15,8 @@ import DashboardMenu from "@/pages/DashboardMenu";
 import DashboardTheme from "@/pages/DashboardTheme";
 import DashboardSettings from "@/pages/DashboardSettings";
 import CustomerQR from "@/pages/CustomerQR";
+import CustomerSplit from "@/pages/CustomerSplit";
+import CustomerPay from "@/pages/CustomerPay";
 import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
