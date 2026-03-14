@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { RestaurantProvider } from "@/contexts/RestaurantContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import DashboardLayout from "@/components/DashboardLayout";
 
 import Login from "@/pages/Login";
 import Dashboard from "@/pages/Dashboard";
@@ -30,13 +31,21 @@ const App = () => (
             <Route path="/login" element={<Login />} />
             <Route path="/r/:slug/t/:tableNumber" element={<CustomerQR />} />
 
-            {/* Protected dashboard */}
-            <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-            <Route path="/dashboard/tables" element={<ProtectedRoute><DashboardTables /></ProtectedRoute>} />
-            <Route path="/dashboard/bills/:tableId" element={<ProtectedRoute><DashboardBills /></ProtectedRoute>} />
-            <Route path="/dashboard/menu" element={<ProtectedRoute><DashboardMenu /></ProtectedRoute>} />
-            <Route path="/dashboard/theme" element={<ProtectedRoute><DashboardTheme /></ProtectedRoute>} />
-            <Route path="/dashboard/settings" element={<ProtectedRoute><DashboardSettings /></ProtectedRoute>} />
+            {/* Protected dashboard with shared layout */}
+            <Route
+              element={
+                <ProtectedRoute>
+                  <DashboardLayout />
+                </ProtectedRoute>
+              }
+            >
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/dashboard/tables" element={<DashboardTables />} />
+              <Route path="/dashboard/bills/:tableId" element={<DashboardBills />} />
+              <Route path="/dashboard/menu" element={<DashboardMenu />} />
+              <Route path="/dashboard/theme" element={<DashboardTheme />} />
+              <Route path="/dashboard/settings" element={<DashboardSettings />} />
+            </Route>
 
             {/* Redirect root to login */}
             <Route path="/" element={<Login />} />
