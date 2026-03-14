@@ -1,73 +1,513 @@
 import { useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useRef, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import type { Restaurant, RestaurantTheme } from "@/lib/types";
+import { useNavigate } from "react-router-dom";
+import type { Restaurant, RestaurantTheme, MenuCategory, MenuItem, Bill, BillItem } from "@/lib/types";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
+import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/hooks/use-toast";
+import {
+  Receipt, UtensilsCrossed, Phone, Bell, MapPin,
+  Instagram, Facebook, Globe, Loader2, AlertCircle,
+  HandHelping, Banknote, MessageSquare
+} from "lucide-react";
+
+type TabType = "bill" | "menu" | "contact";
+
+interface TableRow {
+  id: string;
+  restaurant_id: string | null;
+  table_number: string;
+  label: string | null;
+  capacity: number | null;
+  is_active: boolean | null;
+  created_at: string | null;
+}
 
 const CustomerQR = () => {
   const { slug, tableNumber } = useParams();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
   const [theme, setTheme] = useState<RestaurantTheme | null>(null);
+  const [table, setTable] = useState<TableRow | null>(null);
+  const [bill, setBill] = useState<Bill | null>(null);
+  const [billItems, setBillItems] = useState<BillItem[]>([]);
+  const [categories, setCategories] = useState<MenuCategory[]>([]);
+  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<TabType>("bill");
+  const [updating, setUpdating] = useState(false);
+  const [waiterSheetOpen, setWaiterSheetOpen] = useState(false);
+  const [waiterMessage, setWaiterMessage] = useState("");
+  const [waiterSending, setWaiterSending] = useState(false);
+  const [activeCategory, setActiveCategory] = useState<string | null>(null);
 
+  const categoryRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
+
+  // Apply theme CSS custom properties
+  useEffect(() => {
+    if (!theme) return;
+    const root = document.documentElement;
+    if (theme.primary_color) root.style.setProperty("--qr-primary", theme.primary_color);
+    if (theme.secondary_color) root.style.setProperty("--qr-secondary", theme.secondary_color);
+    if (theme.background_color) root.style.setProperty("--qr-bg", theme.background_color);
+
+    // Load Google Font
+    if (theme.font_family) {
+      const existing = document.getElementById("qr-google-font");
+      if (existing) existing.remove();
+      const link = document.createElement("link");
+      link.id = "qr-google-font";
+      link.rel = "stylesheet";
+      link.href = `https://fonts.googleapis.com/css2?family=${theme.font_family.replace(/ /g, "+")}:wght@400;500;600;700&display=swap`;
+      document.head.appendChild(link);
+    }
+
+    return () => {
+      root.style.removeProperty("--qr-primary");
+      root.style.removeProperty("--qr-secondary");
+      root.style.removeProperty("--qr-bg");
+      const el = document.getElementById("qr-google-font");
+      if (el) el.remove();
+    };
+  }, [theme]);
+
+  const fetchBill = useCallback(async (tableId: string, restaurantId: string) => {
+    const { data: billData } = await supabase
+      .from("bills")
+      .select("*")
+      .eq("table_id", tableId)
+      .eq("restaurant_id", restaurantId)
+      .eq("status", "open")
+      .maybeSingle();
+
+    setBill(billData as Bill | null);
+
+    if (billData) {
+      const { data: items } = await supabase
+        .from("bill_items")
+        .select("*")
+        .eq("bill_id", billData.id)
+        .eq("voided", false)
+        .order("created_at", { ascending: true });
+      setBillItems((items as BillItem[]) || []);
+    } else {
+      setBillItems([]);
+    }
+  }, []);
+
+  // Initial data load
   useEffect(() => {
     const load = async () => {
-      const { data: rest } = await supabase
-        .from("restaurants")
-        .select("*")
-        .eq("slug", slug)
-        .maybeSingle();
-
-      if (rest) {
-        setRestaurant(rest as Restaurant);
-        const { data: t } = await supabase
-          .from("restaurant_themes")
+      try {
+        // 1. Restaurant
+        const { data: rest, error: restErr } = await supabase
+          .from("restaurants")
           .select("*")
-          .eq("restaurant_id", rest.id)
+          .eq("slug", slug)
           .maybeSingle();
-        setTheme(t as RestaurantTheme | null);
+        if (restErr) throw restErr;
+        if (!rest) { setError("not_found"); setLoading(false); return; }
+        setRestaurant(rest as Restaurant);
+
+        const rid = rest.id;
+
+        // 2-5 in parallel
+        const [themeRes, tableRes, menuCatRes, menuItemRes] = await Promise.all([
+          supabase.from("restaurant_themes").select("*").eq("restaurant_id", rid).maybeSingle(),
+          supabase.from("tables").select("*").eq("restaurant_id", rid).eq("table_number", tableNumber!).maybeSingle(),
+          supabase.from("menu_categories").select("*").eq("restaurant_id", rid).order("sort_order"),
+          supabase.from("menu_items").select("*").eq("restaurant_id", rid).eq("is_available", true).order("sort_order"),
+        ]);
+
+        setTheme(themeRes.data as RestaurantTheme | null);
+        if (!tableRes.data) { setError("table_not_found"); setLoading(false); return; }
+        setTable(tableRes.data as TableRow);
+        setCategories((menuCatRes.data as MenuCategory[]) || []);
+        setMenuItems((menuItemRes.data as MenuItem[]) || []);
+        if (menuCatRes.data?.length) setActiveCategory(menuCatRes.data[0].id);
+
+        // Fetch bill
+        await fetchBill(tableRes.data.id, rid);
+      } catch (e: any) {
+        setError(e.message);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
     load();
-  }, [slug]);
+  }, [slug, tableNumber, fetchBill]);
 
+  // Realtime subscription
+  useEffect(() => {
+    if (!table || !restaurant) return;
+
+    const refetch = () => {
+      setUpdating(true);
+      fetchBill(table.id, restaurant.id).finally(() => setTimeout(() => setUpdating(false), 600));
+    };
+
+    const channel = supabase
+      .channel(`bill-updates-${table.id}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: "bills", filter: `table_id=eq.${table.id}` }, refetch)
+      .on("postgres_changes", { event: "*", schema: "public", table: "bill_items", filter: `bill_id=eq.${bill?.id}` }, refetch)
+      .subscribe();
+
+    channelRef.current = channel;
+    return () => { supabase.removeChannel(channel); };
+  }, [table, restaurant, bill?.id, fetchBill]);
+
+  const formatPrice = (amount: number) => {
+    const currency = restaurant?.currency || "IQD";
+    return new Intl.NumberFormat("en", { style: "currency", currency, minimumFractionDigits: 0 }).format(amount);
+  };
+
+  const scrollToCategory = (catId: string) => {
+    setActiveCategory(catId);
+    categoryRefs.current[catId]?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
+  const sendWaiterRequest = async (type: string, message?: string) => {
+    if (!restaurant || !table) return;
+    setWaiterSending(true);
+    try {
+      await supabase.from("waiter_requests").insert({
+        restaurant_id: restaurant.id,
+        table_id: table.id,
+        bill_id: bill?.id || null,
+        type,
+        message: message || null,
+      });
+      toast({ title: "Your request has been sent! ✓" });
+      setWaiterSheetOpen(false);
+      setWaiterMessage("");
+    } catch {
+      toast({ title: "Failed to send request", variant: "destructive" });
+    } finally {
+      setWaiterSending(false);
+    }
+  };
+
+  const primaryColor = theme?.primary_color || "#F5A623";
+  const bgColor = theme?.background_color || "#F5F5F0";
+  const secondaryColor = theme?.secondary_color || "#1E3A5F";
+  const fontFamily = theme?.font_family || "Inter";
+
+  const menuByCategory = useMemo(() => {
+    const map: Record<string, MenuItem[]> = {};
+    categories.forEach((c) => { map[c.id] = []; });
+    menuItems.forEach((item) => {
+      if (item.category_id && map[item.category_id]) {
+        map[item.category_id].push(item);
+      }
+    });
+    return map;
+  }, [categories, menuItems]);
+
+  // --- LOADING ---
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-background">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+      <div className="flex min-h-screen flex-col items-center px-4 pt-12" style={{ backgroundColor: bgColor }}>
+        <Skeleton className="mb-4 h-20 w-20 rounded-2xl" />
+        <Skeleton className="mb-2 h-8 w-48" />
+        <Skeleton className="mb-6 h-4 w-24" />
+        <Skeleton className="mb-4 h-10 w-full max-w-sm rounded-full" />
+        <div className="w-full max-w-sm space-y-3">
+          {[1, 2, 3].map((i) => <Skeleton key={i} className="h-20 w-full rounded-xl" />)}
+        </div>
       </div>
     );
   }
 
-  if (!restaurant) {
+  // --- ERROR ---
+  if (error) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-background">
-        <p className="text-muted-foreground">Restaurant not found.</p>
+      <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-background px-4">
+        <AlertCircle className="h-12 w-12 text-muted-foreground" />
+        <p className="text-lg font-medium text-foreground">
+          {error === "not_found" || error === "table_not_found" ? "Table not found" : "Something went wrong"}
+        </p>
+        <p className="text-sm text-muted-foreground">Please scan the QR code again or ask your server.</p>
       </div>
     );
   }
+
+  const tabs: { key: TabType; label: string; icon: React.ReactNode }[] = [
+    { key: "bill", label: "Bill", icon: <Receipt className="h-4 w-4" /> },
+    { key: "menu", label: "Menu", icon: <UtensilsCrossed className="h-4 w-4" /> },
+    { key: "contact", label: "Contact", icon: <Phone className="h-4 w-4" /> },
+  ];
 
   return (
-    <div
-      className="flex min-h-screen flex-col items-center px-5 pb-10 pt-12"
-      style={{ backgroundColor: theme?.background_color || undefined }}
-    >
-      {theme?.logo_url && (
-        <img src={theme.logo_url} alt={restaurant.name} className="mb-4 h-20 w-20 rounded-2xl object-contain" />
-      )}
-      <h1
-        className="mb-1 text-3xl font-bold"
-        style={{ color: theme?.secondary_color || undefined, fontFamily: theme?.font_family }}
-      >
-        {restaurant.name}
-      </h1>
-      <p className="mb-6 text-sm text-muted-foreground">Table {tableNumber}</p>
+    <div className="min-h-screen pb-24" style={{ backgroundColor: bgColor, fontFamily }}>
+      {/* HEADER */}
+      <header className="flex flex-col items-center px-5 pt-8 pb-4">
+        {theme?.logo_url && (
+          <img src={theme.logo_url} alt={restaurant?.name} className="mb-3 h-20 w-20 rounded-2xl object-contain" />
+        )}
+        {theme?.intro_video_url && (
+          <video
+            src={theme.intro_video_url}
+            className="mb-3 w-full max-w-xs rounded-xl"
+            autoPlay muted loop playsInline
+          />
+        )}
+        <h1 className="mb-0.5 text-2xl font-bold" style={{ color: secondaryColor, fontFamily }}>
+          {restaurant?.name}
+        </h1>
+        <p className="text-sm" style={{ color: `${secondaryColor}99` }}>Table {tableNumber}</p>
+      </header>
 
-      <div className="w-full max-w-sm rounded-2xl bg-card p-6 shadow-sm ring-1 ring-border">
-        <p className="text-center text-sm text-secondary-foreground">
-          Welcome! Your server will be with you shortly. Scan QR to view the menu and manage your bill.
-        </p>
-      </div>
+      {/* STICKY TAB BAR */}
+      <nav className="sticky top-0 z-30 flex justify-center gap-2 px-5 py-3" style={{ backgroundColor: bgColor }}>
+        {tabs.map((t) => (
+          <button
+            key={t.key}
+            onClick={() => setActiveTab(t.key)}
+            className="flex items-center gap-1.5 rounded-full px-5 py-2 text-sm font-medium transition-all"
+            style={
+              activeTab === t.key
+                ? { backgroundColor: primaryColor, color: "#fff" }
+                : { backgroundColor: `${secondaryColor}12`, color: secondaryColor }
+            }
+          >
+            {t.icon} {t.label}
+          </button>
+        ))}
+      </nav>
+
+      <main className="mx-auto w-full max-w-md px-4">
+        {/* ====== BILL TAB ====== */}
+        {activeTab === "bill" && (
+          <section className="space-y-4">
+            {updating && (
+              <div className="flex items-center justify-center gap-2 text-xs" style={{ color: secondaryColor }}>
+                <Loader2 className="h-3 w-3 animate-spin" /> Updating...
+              </div>
+            )}
+
+            {!bill ? (
+              <div className="flex flex-col items-center gap-3 rounded-2xl bg-card p-8 text-center shadow-sm ring-1 ring-border">
+                <Receipt className="h-12 w-12 text-muted-foreground" />
+                <p className="text-sm text-muted-foreground">
+                  No open bill yet — your items will appear here when ordered
+                </p>
+              </div>
+            ) : (
+              <>
+                <div className="flex items-center justify-end">
+                  <span className="flex items-center gap-1.5 rounded-full bg-green-100 px-2.5 py-1 text-xs font-medium text-green-700">
+                    <span className="h-2 w-2 animate-pulse rounded-full bg-green-500" /> Live
+                  </span>
+                </div>
+
+                <div className="space-y-2">
+                  {billItems.map((item) => (
+                    <div key={item.id} className="flex items-center justify-between rounded-xl bg-card p-4 shadow-sm ring-1 ring-border">
+                      <div>
+                        <p className="text-sm font-medium" style={{ color: secondaryColor }}>{item.name}</p>
+                        <p className="text-xs text-muted-foreground">× {item.quantity}</p>
+                      </div>
+                      <p className="text-sm font-semibold" style={{ color: secondaryColor }}>
+                        {formatPrice(item.total_price)}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Summary */}
+                <div className="rounded-xl bg-card p-4 shadow-sm ring-1 ring-border">
+                  <div className="flex justify-between text-sm text-muted-foreground">
+                    <span>Subtotal</span><span>{formatPrice(bill.subtotal)}</span>
+                  </div>
+                  <div className="flex justify-between text-sm text-muted-foreground">
+                    <span>Tax</span><span>{formatPrice(bill.tax_amount)}</span>
+                  </div>
+                  <div className="mt-2 flex justify-between border-t pt-2 text-base font-bold" style={{ color: secondaryColor }}>
+                    <span>Total</span><span>{formatPrice(bill.total)}</span>
+                  </div>
+                </div>
+
+                <div className="flex gap-3">
+                  <Button
+                    variant="outline"
+                    className="flex-1 rounded-xl"
+                    onClick={() => navigate(`/r/${slug}/t/${tableNumber}/split`)}
+                  >
+                    Split Bill
+                  </Button>
+                  <Button
+                    className="flex-1 rounded-xl text-white"
+                    style={{ backgroundColor: primaryColor }}
+                    onClick={() => navigate(`/r/${slug}/t/${tableNumber}/pay`)}
+                  >
+                    Pay Now
+                  </Button>
+                </div>
+              </>
+            )}
+          </section>
+        )}
+
+        {/* ====== MENU TAB ====== */}
+        {activeTab === "menu" && (
+          <section>
+            {/* Category pills */}
+            <div className="mb-4 flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+              {categories.map((cat) => (
+                <button
+                  key={cat.id}
+                  onClick={() => scrollToCategory(cat.id)}
+                  className="shrink-0 rounded-full px-4 py-1.5 text-xs font-medium transition-all"
+                  style={
+                    activeCategory === cat.id
+                      ? { backgroundColor: primaryColor, color: "#fff" }
+                      : { backgroundColor: `${secondaryColor}12`, color: secondaryColor }
+                  }
+                >
+                  {cat.name}
+                </button>
+              ))}
+            </div>
+
+            {categories.map((cat) => {
+              const items = menuByCategory[cat.id] || [];
+              if (!items.length) return null;
+              return (
+                <div key={cat.id} ref={(el) => { categoryRefs.current[cat.id] = el; }} className="mb-6">
+                  <h3 className="mb-3 text-lg font-semibold" style={{ color: secondaryColor }}>{cat.name}</h3>
+                  <div className={theme?.menu_layout === "list" ? "space-y-3" : "grid grid-cols-2 gap-3"}>
+                    {items.map((item) => (
+                      <div key={item.id} className="overflow-hidden rounded-xl bg-card shadow-sm ring-1 ring-border">
+                        {item.image_url && (
+                          <img src={item.image_url} alt={item.name} className="h-28 w-full object-cover" />
+                        )}
+                        <div className="p-3">
+                          <p className="text-sm font-medium" style={{ color: secondaryColor }}>{item.name}</p>
+                          {item.description && (
+                            <p className="mt-0.5 line-clamp-2 text-xs text-muted-foreground">{item.description}</p>
+                          )}
+                          <p className="mt-1.5 text-sm font-bold" style={{ color: primaryColor }}>
+                            {formatPrice(item.price)}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+          </section>
+        )}
+
+        {/* ====== CONTACT TAB ====== */}
+        {activeTab === "contact" && (
+          <section className="space-y-4">
+            {restaurant?.address && (
+              <a
+                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(restaurant.address)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-start gap-3 rounded-xl bg-card p-4 shadow-sm ring-1 ring-border"
+              >
+                <MapPin className="mt-0.5 h-5 w-5 shrink-0" style={{ color: primaryColor }} />
+                <span className="text-sm" style={{ color: secondaryColor }}>{restaurant.address}</span>
+              </a>
+            )}
+            {restaurant?.phone && (
+              <a
+                href={`tel:${restaurant.phone}`}
+                className="flex items-center gap-3 rounded-xl bg-card p-4 shadow-sm ring-1 ring-border"
+              >
+                <Phone className="h-5 w-5 shrink-0" style={{ color: primaryColor }} />
+                <span className="text-sm" style={{ color: secondaryColor }}>{restaurant.phone}</span>
+              </a>
+            )}
+            <div className="flex justify-center gap-4 pt-2">
+              {restaurant?.instagram && (
+                <a href={`https://instagram.com/${restaurant.instagram}`} target="_blank" rel="noopener noreferrer"
+                  className="flex h-12 w-12 items-center justify-center rounded-full" style={{ backgroundColor: `${primaryColor}20` }}>
+                  <Instagram className="h-5 w-5" style={{ color: primaryColor }} />
+                </a>
+              )}
+              {restaurant?.facebook && (
+                <a href={restaurant.facebook} target="_blank" rel="noopener noreferrer"
+                  className="flex h-12 w-12 items-center justify-center rounded-full" style={{ backgroundColor: `${primaryColor}20` }}>
+                  <Facebook className="h-5 w-5" style={{ color: primaryColor }} />
+                </a>
+              )}
+              {restaurant?.website && (
+                <a href={restaurant.website} target="_blank" rel="noopener noreferrer"
+                  className="flex h-12 w-12 items-center justify-center rounded-full" style={{ backgroundColor: `${primaryColor}20` }}>
+                  <Globe className="h-5 w-5" style={{ color: primaryColor }} />
+                </a>
+              )}
+            </div>
+          </section>
+        )}
+      </main>
+
+      {/* FLOATING WAITER BUTTON */}
+      <button
+        onClick={() => setWaiterSheetOpen(true)}
+        className="fixed bottom-6 right-6 z-40 flex h-14 w-14 items-center justify-center rounded-full shadow-lg transition-transform active:scale-95"
+        style={{ backgroundColor: primaryColor, color: "#fff" }}
+      >
+        <Bell className="h-6 w-6" />
+      </button>
+
+      {/* WAITER REQUEST SHEET */}
+      <Sheet open={waiterSheetOpen} onOpenChange={setWaiterSheetOpen}>
+        <SheetContent side="bottom" className="rounded-t-2xl">
+          <SheetHeader>
+            <SheetTitle>Request Waiter</SheetTitle>
+            <SheetDescription>How can we help you?</SheetDescription>
+          </SheetHeader>
+          <div className="mt-4 space-y-3">
+            <button
+              onClick={() => sendWaiterRequest("help")}
+              disabled={waiterSending}
+              className="flex w-full items-center gap-3 rounded-xl bg-muted p-4 text-left text-sm font-medium transition-colors hover:bg-accent"
+            >
+              <HandHelping className="h-5 w-5 text-muted-foreground" /> I need help
+            </button>
+            <button
+              onClick={() => sendWaiterRequest("cash_payment")}
+              disabled={waiterSending}
+              className="flex w-full items-center gap-3 rounded-xl bg-muted p-4 text-left text-sm font-medium transition-colors hover:bg-accent"
+            >
+              <Banknote className="h-5 w-5 text-muted-foreground" /> I want to pay with cash
+            </button>
+            <div className="rounded-xl bg-muted p-4">
+              <div className="mb-2 flex items-center gap-3 text-sm font-medium">
+                <MessageSquare className="h-5 w-5 text-muted-foreground" /> Other
+              </div>
+              <Textarea
+                placeholder="Write your message..."
+                value={waiterMessage}
+                onChange={(e) => setWaiterMessage(e.target.value)}
+                className="mb-3"
+              />
+              <Button
+                size="sm"
+                disabled={waiterSending || !waiterMessage.trim()}
+                onClick={() => sendWaiterRequest("other", waiterMessage)}
+                style={{ backgroundColor: primaryColor }}
+                className="text-white"
+              >
+                {waiterSending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Send"}
+              </Button>
+            </div>
+          </div>
+        </SheetContent>
+      </Sheet>
     </div>
   );
 };
