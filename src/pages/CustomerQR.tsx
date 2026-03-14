@@ -28,7 +28,7 @@ interface TableRow {
 }
 
 const CustomerQR = () => {
-  const { slug, tableNumber } = useParams();
+  const { slug, token } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
 
