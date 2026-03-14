@@ -30,6 +30,7 @@ const DashboardTables = () => {
   const qc = useQueryClient();
   const navigate = useNavigate();
   const [addOpen, setAddOpen] = useState(false);
+  const [printOpen, setPrintOpen] = useState(false);
   const [tableNumber, setTableNumber] = useState("");
   const [label, setLabel] = useState("");
   const [capacity, setCapacity] = useState("4");
