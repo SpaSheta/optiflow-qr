@@ -126,8 +126,9 @@ const DashboardLayout = () => {
           <button onClick={() => setMobileOpen(true)}>
             <Menu className="h-5 w-5 text-foreground" />
           </button>
+          <img src={optiflowIcon} alt="OptiFlow" className="ml-3 h-6 w-6" />
           <span
-            className="ml-3 text-base font-bold text-foreground"
+            className="ml-1.5 text-base font-bold text-foreground"
             style={{ fontFamily: "var(--restaurant-name)" }}
           >
             OptiFlow
