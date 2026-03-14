@@ -19,7 +19,8 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
-import { Plus, Download, Copy, RefreshCw } from "lucide-react";
+import { Plus, Download, Copy, RefreshCw, Printer } from "lucide-react";
+import PrintableQRCard from "@/components/PrintableQRCard";
 import { useNavigate } from "react-router-dom";
 import QRCode from "qrcode";
 
@@ -29,6 +30,7 @@ const DashboardTables = () => {
   const qc = useQueryClient();
   const navigate = useNavigate();
   const [addOpen, setAddOpen] = useState(false);
+  const [printOpen, setPrintOpen] = useState(false);
   const [tableNumber, setTableNumber] = useState("");
   const [label, setLabel] = useState("");
   const [capacity, setCapacity] = useState("4");
@@ -174,10 +176,14 @@ const DashboardTables = () => {
         <h1 className="text-2xl font-bold text-foreground" style={{ fontFamily: "var(--restaurant-name)" }}>
           Tables
         </h1>
-        <Dialog open={addOpen} onOpenChange={setAddOpen}>
-          <DialogTrigger asChild>
-            <Button><Plus className="mr-2 h-4 w-4" />Add Table</Button>
-          </DialogTrigger>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={() => setPrintOpen(true)} disabled={tables.length === 0}>
+            <Printer className="mr-2 h-4 w-4" />Print QR Cards
+          </Button>
+          <Dialog open={addOpen} onOpenChange={setAddOpen}>
+            <DialogTrigger asChild>
+              <Button><Plus className="mr-2 h-4 w-4" />Add Table</Button>
+            </DialogTrigger>
           <DialogContent>
             <DialogHeader><DialogTitle>Add Table</DialogTitle></DialogHeader>
             <form
@@ -202,6 +208,7 @@ const DashboardTables = () => {
             </form>
           </DialogContent>
         </Dialog>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -272,6 +279,18 @@ const DashboardTables = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <PrintableQRCard
+        open={printOpen}
+        onOpenChange={setPrintOpen}
+        tables={tables.map((t) => ({
+          id: t.id,
+          table_number: t.table_number,
+          label: t.label,
+          qrDataUrl: qrDataUrls[t.id],
+        }))}
+        restaurantName={restaurant?.name ?? "Restaurant"}
+      />
     </div>
   );
 };
