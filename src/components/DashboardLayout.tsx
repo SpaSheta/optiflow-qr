@@ -1,4 +1,5 @@
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
+import optiflowIcon from "@/assets/optiflow-icon.png";
 import { useRestaurant } from "@/contexts/RestaurantContext";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -41,7 +42,8 @@ const DashboardLayout = () => {
   const sidebar = (
     <div className="flex h-full flex-col">
       {/* Logo */}
-      <div className="flex h-14 items-center gap-2 border-b border-sidebar-border px-4">
+      <div className="flex h-14 items-center gap-2.5 border-b border-sidebar-border px-4">
+        <img src={optiflowIcon} alt="OptiFlow" className="h-7 w-7" />
         <span
           className="text-lg font-bold text-sidebar-foreground"
           style={{ fontFamily: "var(--restaurant-name)" }}
@@ -124,8 +126,9 @@ const DashboardLayout = () => {
           <button onClick={() => setMobileOpen(true)}>
             <Menu className="h-5 w-5 text-foreground" />
           </button>
+          <img src={optiflowIcon} alt="OptiFlow" className="ml-3 h-6 w-6" />
           <span
-            className="ml-3 text-base font-bold text-foreground"
+            className="ml-1.5 text-base font-bold text-foreground"
             style={{ fontFamily: "var(--restaurant-name)" }}
           >
             OptiFlow
