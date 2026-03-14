@@ -1,0 +1,98 @@
+import { createContext, useContext, useEffect, useState, ReactNode } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import type { Restaurant, RestaurantTheme } from "@/lib/types";
+import type { User } from "@supabase/supabase-js";
+
+interface RestaurantContextValue {
+  user: User | null;
+  restaurant: Restaurant | null;
+  theme: RestaurantTheme | null;
+  isLoading: boolean;
+  error: string | null;
+  refetch: () => Promise<void>;
+}
+
+const RestaurantContext = createContext<RestaurantContextValue>({
+  user: null,
+  restaurant: null,
+  theme: null,
+  isLoading: true,
+  error: null,
+  refetch: async () => {},
+});
+
+export const useRestaurant = () => useContext(RestaurantContext);
+
+export const RestaurantProvider = ({ children }: { children: ReactNode }) => {
+  const [user, setUser] = useState<User | null>(null);
+  const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
+  const [theme, setTheme] = useState<RestaurantTheme | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchRestaurant = async (userId: string) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const { data: rest, error: restErr } = await supabase
+        .from("restaurants")
+        .select("*")
+        .eq("owner_user_id", userId)
+        .maybeSingle();
+
+      if (restErr) throw restErr;
+      setRestaurant(rest as Restaurant | null);
+
+      if (rest) {
+        const { data: themeData } = await supabase
+          .from("restaurant_themes")
+          .select("*")
+          .eq("restaurant_id", rest.id)
+          .maybeSingle();
+        setTheme(themeData as RestaurantTheme | null);
+      }
+    } catch (e: any) {
+      setError(e.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const refetch = async () => {
+    if (user) await fetchRestaurant(user.id);
+  };
+
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        const u = session?.user ?? null;
+        setUser(u);
+        if (u) {
+          fetchRestaurant(u.id);
+        } else {
+          setRestaurant(null);
+          setTheme(null);
+          setIsLoading(false);
+        }
+      }
+    );
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      const u = session?.user ?? null;
+      setUser(u);
+      if (u) {
+        fetchRestaurant(u.id);
+      } else {
+        setIsLoading(false);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  return (
+    <RestaurantContext.Provider value={{ user, restaurant, theme, isLoading, error, refetch }}>
+      {children}
+    </RestaurantContext.Provider>
+  );
+};
