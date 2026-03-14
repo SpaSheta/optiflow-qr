@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRestaurant } from "@/contexts/RestaurantContext";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -8,8 +8,18 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
-import { Plus, Download, Pencil } from "lucide-react";
+import { Plus, Download, Copy, RefreshCw } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import QRCode from "qrcode";
 
@@ -27,6 +37,15 @@ const DashboardTables = () => {
     queryKey: ["tables", rid],
     queryFn: async () => {
       const { data } = await supabase.from("tables").select("*").eq("restaurant_id", rid!).order("table_number");
+      return data ?? [];
+    },
+    enabled: !!rid,
+  });
+
+  const { data: qrTokens = [] } = useQuery({
+    queryKey: ["qr-tokens", rid],
+    queryFn: async () => {
+      const { data } = await supabase.from("table_qr_tokens").select("*").eq("restaurant_id", rid!);
       return data ?? [];
     },
     enabled: !!rid,
@@ -50,6 +69,7 @@ const DashboardTables = () => {
     enabled: !!rid,
   });
 
+  const tokenMap = new Map(qrTokens.map((t: any) => [t.table_id, t]));
   const billTableIds = new Set(openBills.map((b) => b.table_id));
   const attentionTableIds = new Set(pendingRequests.map((r) => r.table_id));
 
@@ -58,6 +78,28 @@ const DashboardTables = () => {
     if (billTableIds.has(tableId)) return "open";
     return "empty";
   };
+
+  const getQrUrl = (token: string) =>
+    `${window.location.origin}/r/${restaurant?.slug}/t/${token}`;
+
+  // Generate QR data URLs for all tables
+  const [qrDataUrls, setQrDataUrls] = useState<Record<string, string>>({});
+  useEffect(() => {
+    const generate = async () => {
+      const urls: Record<string, string> = {};
+      for (const tbl of tables) {
+        const tokenRow = tokenMap.get(tbl.id) as any;
+        if (!tokenRow?.token) continue;
+        try {
+          urls[tbl.id] = await QRCode.toDataURL(getQrUrl(tokenRow.token), {
+            width: 500, margin: 2, color: { dark: "#1E3A5F", light: "#FFFFFF" },
+          });
+        } catch { /* skip */ }
+      }
+      setQrDataUrls(urls);
+    };
+    if (tables.length > 0 && restaurant?.slug) generate();
+  }, [tables, qrTokens, restaurant?.slug]);
 
   const addMutation = useMutation({
     mutationFn: async () => {
@@ -71,6 +113,7 @@ const DashboardTables = () => {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["tables", rid] });
+      qc.invalidateQueries({ queryKey: ["qr-tokens", rid] });
       setAddOpen(false);
       setTableNumber("");
       setLabel("");
@@ -80,17 +123,39 @@ const DashboardTables = () => {
     onError: (e: any) => toast.error(e.message),
   });
 
-  const downloadQR = async (tblNumber: string) => {
-    const url = `${window.location.origin}/r/${restaurant?.slug}/t/${tblNumber}`;
-    try {
-      const dataUrl = await QRCode.toDataURL(url, { width: 512, margin: 2 });
-      const a = document.createElement("a");
-      a.href = dataUrl;
-      a.download = `table-${tblNumber}-qr.png`;
-      a.click();
-    } catch {
-      toast.error("Failed to generate QR");
-    }
+  /* ── Regenerate QR ── */
+  const [regenTableId, setRegenTableId] = useState<string | null>(null);
+  const regenMutation = useMutation({
+    mutationFn: async (tableId: string) => {
+      const newToken = crypto.randomUUID();
+      const { error } = await supabase
+        .from("table_qr_tokens")
+        .update({ token: newToken, regenerated_at: new Date().toISOString() })
+        .eq("table_id", tableId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["qr-tokens", rid] });
+      setRegenTableId(null);
+      toast.success("QR code regenerated");
+    },
+    onError: (e: any) => toast.error(e.message),
+  });
+
+  const downloadQR = (tableId: string, tblNumber: string) => {
+    const dataUrl = qrDataUrls[tableId];
+    if (!dataUrl) return;
+    const a = document.createElement("a");
+    a.href = dataUrl;
+    a.download = `${restaurant?.name ?? "restaurant"}-table-${tblNumber}.png`;
+    a.click();
+  };
+
+  const copyLink = (tableId: string) => {
+    const tokenRow = tokenMap.get(tableId) as any;
+    if (!tokenRow?.token) return;
+    navigator.clipboard.writeText(getQrUrl(tokenRow.token));
+    toast.success("Link copied!");
   };
 
   const statusBadge = (status: string) => {
@@ -139,16 +204,23 @@ const DashboardTables = () => {
         </Dialog>
       </div>
 
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {tables.map((t) => {
           const status = getStatus(t.id);
+          const qrImg = qrDataUrls[t.id];
           return (
             <Card key={t.id} className="relative">
               <CardContent className="flex flex-col items-center gap-3 p-5">
-                <span className="text-3xl font-bold text-foreground">{t.table_number}</span>
+                {qrImg && (
+                  <div className="rounded-xl border border-border bg-white p-2">
+                    <img src={qrImg} alt={`Table ${t.table_number} QR`} className="h-[140px] w-[140px]" />
+                  </div>
+                )}
+                <span className="text-2xl font-bold text-foreground">{t.table_number}</span>
+                {t.label && <span className="text-xs text-muted-foreground">{t.label}</span>}
                 {statusBadge(status)}
                 <span className="text-xs text-muted-foreground">{t.capacity} seats</span>
-                <div className="flex w-full gap-2">
+                <div className="flex w-full flex-wrap gap-2">
                   <Button
                     size="sm"
                     variant="outline"
@@ -157,8 +229,20 @@ const DashboardTables = () => {
                   >
                     Manage Bill
                   </Button>
-                  <Button size="sm" variant="outline" onClick={() => downloadQR(t.table_number)}>
+                  <Button size="sm" variant="outline" onClick={() => copyLink(t.id)} title="Copy Link">
+                    <Copy className="h-3.5 w-3.5" />
+                  </Button>
+                  <Button size="sm" variant="outline" onClick={() => downloadQR(t.id, t.table_number)} title="Download QR">
                     <Download className="h-3.5 w-3.5" />
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setRegenTableId(t.id)}
+                    title="Regenerate QR"
+                    className="text-amber-600"
+                  >
+                    <RefreshCw className="h-3.5 w-3.5" />
                   </Button>
                 </div>
               </CardContent>
@@ -170,6 +254,24 @@ const DashboardTables = () => {
       {tables.length === 0 && (
         <p className="mt-8 text-center text-muted-foreground">No tables yet. Click "Add Table" to get started.</p>
       )}
+
+      {/* Regenerate QR confirmation */}
+      <AlertDialog open={!!regenTableId} onOpenChange={() => setRegenTableId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Regenerate QR Code</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will invalidate the current QR code. Old printed QR codes will stop working. Continue?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={() => regenTableId && regenMutation.mutate(regenTableId)}>
+              Regenerate
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

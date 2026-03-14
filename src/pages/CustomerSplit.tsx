@@ -3,14 +3,14 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 
 const CustomerSplit = () => {
-  const { slug, tableNumber } = useParams();
+  const { slug, token } = useParams();
   const navigate = useNavigate();
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-background px-4">
       <h1 className="text-xl font-semibold text-foreground">Split Bill</h1>
       <p className="text-sm text-muted-foreground">Coming soon</p>
-      <Button variant="outline" onClick={() => navigate(`/r/${slug}/t/${tableNumber}`)}>
+      <Button variant="outline" onClick={() => navigate(`/r/${slug}/t/${token}`)}>
         <ArrowLeft className="mr-2 h-4 w-4" /> Back to Bill
       </Button>
     </div>

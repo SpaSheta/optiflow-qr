@@ -28,7 +28,7 @@ interface TableRow {
 }
 
 const CustomerQR = () => {
-  const { slug, tableNumber } = useParams();
+  const { slug, token } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -103,15 +103,25 @@ const CustomerQR = () => {
     }
   }, []);
 
-  // Initial data load
+  // Initial data load — resolve token → table → restaurant
   useEffect(() => {
     const load = async () => {
       try {
-        // 1. Restaurant
+        // 1. Resolve QR token
+        const { data: tokenRow, error: tokenErr } = await supabase
+          .from("table_qr_tokens")
+          .select("*")
+          .eq("token", token!)
+          .maybeSingle();
+        if (tokenErr) throw tokenErr;
+        if (!tokenRow) { setError("not_found"); setLoading(false); return; }
+
+        // 2. Validate restaurant slug matches
         const { data: rest, error: restErr } = await supabase
           .from("restaurants")
           .select("*")
-          .eq("slug", slug)
+          .eq("id", tokenRow.restaurant_id!)
+          .eq("slug", slug!)
           .maybeSingle();
         if (restErr) throw restErr;
         if (!rest) { setError("not_found"); setLoading(false); return; }
@@ -119,17 +129,17 @@ const CustomerQR = () => {
 
         const rid = rest.id;
 
-        // 2-5 in parallel
-        const [themeRes, tableRes, menuCatRes, menuItemRes] = await Promise.all([
+        // 3. Fetch table + theme + menu in parallel
+        const [tableRes, themeRes, menuCatRes, menuItemRes] = await Promise.all([
+          supabase.from("tables").select("*").eq("id", tokenRow.table_id!).maybeSingle(),
           supabase.from("restaurant_themes").select("*").eq("restaurant_id", rid).maybeSingle(),
-          supabase.from("tables").select("*").eq("restaurant_id", rid).eq("table_number", tableNumber!).maybeSingle(),
           supabase.from("menu_categories").select("*").eq("restaurant_id", rid).order("sort_order"),
           supabase.from("menu_items").select("*").eq("restaurant_id", rid).eq("is_available", true).order("sort_order"),
         ]);
 
-        setTheme(themeRes.data as RestaurantTheme | null);
         if (!tableRes.data) { setError("table_not_found"); setLoading(false); return; }
         setTable(tableRes.data as TableRow);
+        setTheme(themeRes.data as RestaurantTheme | null);
         setCategories((menuCatRes.data as MenuCategory[]) || []);
         setMenuItems((menuItemRes.data as MenuItem[]) || []);
         if (menuCatRes.data?.length) setActiveCategory(menuCatRes.data[0].id);
@@ -143,7 +153,7 @@ const CustomerQR = () => {
       }
     };
     load();
-  }, [slug, tableNumber, fetchBill]);
+  }, [slug, token, fetchBill]);
 
   // Realtime subscription
   useEffect(() => {
@@ -262,7 +272,7 @@ const CustomerQR = () => {
         <h1 className="mb-0.5 text-2xl font-bold" style={{ color: secondaryColor, fontFamily }}>
           {restaurant?.name}
         </h1>
-        <p className="text-sm" style={{ color: `${secondaryColor}99` }}>Table {tableNumber}</p>
+        <p className="text-sm" style={{ color: `${secondaryColor}99` }}>Table {table?.table_number}</p>
       </header>
 
       {/* STICKY TAB BAR */}
@@ -339,14 +349,14 @@ const CustomerQR = () => {
                   <Button
                     variant="outline"
                     className="flex-1 rounded-xl"
-                    onClick={() => navigate(`/r/${slug}/t/${tableNumber}/split`)}
+                    onClick={() => navigate(`/r/${slug}/t/${token}/split`)}
                   >
                     Split Bill
                   </Button>
                   <Button
                     className="flex-1 rounded-xl text-white"
                     style={{ backgroundColor: primaryColor }}
-                    onClick={() => navigate(`/r/${slug}/t/${tableNumber}/pay`)}
+                    onClick={() => navigate(`/r/${slug}/t/${token}/pay`)}
                   >
                     Pay Now
                   </Button>
