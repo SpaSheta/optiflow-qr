@@ -50,7 +50,6 @@ const DashboardLayout = () => {
         >
           OptiFlow
         </span>
-        </span>
         <button
           className="ml-auto md:hidden"
           onClick={() => setMobileOpen(false)}
