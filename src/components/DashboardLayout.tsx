@@ -29,6 +29,7 @@ const DashboardLayout = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const pendingCashCount = usePendingCashCount();
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
