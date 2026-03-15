@@ -2,6 +2,7 @@ import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import optiflowIcon from "@/assets/optiflow-icon.png";
 import { useRestaurant } from "@/contexts/RestaurantContext";
 import { supabase } from "@/integrations/supabase/client";
+import { usePendingCashCount } from "@/components/PendingCashPayments";
 import {
   LayoutGrid,
   TableProperties,
@@ -17,7 +18,7 @@ import { cn } from "@/lib/utils";
 
 const NAV = [
   { label: "Overview", icon: LayoutGrid, path: "/dashboard" },
-  { label: "Tables", icon: TableProperties, path: "/dashboard/tables" },
+  { label: "Tables", icon: TableProperties, path: "/dashboard/tables", showBadge: true },
   { label: "Menu", icon: UtensilsCrossed, path: "/dashboard/menu" },
   { label: "Theme", icon: Palette, path: "/dashboard/theme" },
   { label: "Settings", icon: Settings, path: "/dashboard/settings" },
@@ -28,6 +29,7 @@ const DashboardLayout = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const pendingCashCount = usePendingCashCount();
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -75,7 +77,12 @@ const DashboardLayout = () => {
             )}
           >
             <item.icon className="h-4 w-4 shrink-0" />
-            <span>{item.label}</span>
+            <span className="flex-1 text-left">{item.label}</span>
+            {item.showBadge && pendingCashCount > 0 && (
+              <span className="flex h-5 min-w-[20px] items-center justify-center rounded-full bg-amber-500 px-1.5 text-[10px] font-bold text-white">
+                {pendingCashCount}
+              </span>
+            )}
           </button>
         ))}
       </nav>

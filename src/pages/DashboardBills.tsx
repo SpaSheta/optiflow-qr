@@ -15,6 +15,7 @@ import {
 import { toast } from "sonner";
 import { ArrowLeft, Plus, Minus, Trash2, Receipt, Search, Loader2 } from "lucide-react";
 import type { Bill, BillItem, MenuItem, MenuCategory } from "@/lib/types";
+import PendingCashPayments from "@/components/PendingCashPayments";
 
 const DashboardBills = () => {
   const { tableId } = useParams<{ tableId: string }>();
@@ -353,6 +354,15 @@ const DashboardBills = () => {
                 </CardContent>
               </Card>
             ))}
+
+            {/* Pending Cash Payments */}
+            {localBill && (
+              <PendingCashPayments
+                tableId={tableId!}
+                billId={localBill.id}
+                formatPrice={formatPrice}
+              />
+            )}
 
             {/* Summary */}
             {localItems.length > 0 && (

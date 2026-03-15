@@ -339,6 +339,55 @@ export type Database = {
           },
         ]
       }
+      ratings: {
+        Row: {
+          bill_id: string
+          created_at: string | null
+          id: string
+          payment_id: string | null
+          rating: number
+          restaurant_id: string
+        }
+        Insert: {
+          bill_id: string
+          created_at?: string | null
+          id?: string
+          payment_id?: string | null
+          rating: number
+          restaurant_id: string
+        }
+        Update: {
+          bill_id?: string
+          created_at?: string | null
+          id?: string
+          payment_id?: string | null
+          rating?: number
+          restaurant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ratings_bill_id_fkey"
+            columns: ["bill_id"]
+            isOneToOne: false
+            referencedRelation: "bills"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ratings_payment_id_fkey"
+            columns: ["payment_id"]
+            isOneToOne: false
+            referencedRelation: "payments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ratings_restaurant_id_fkey"
+            columns: ["restaurant_id"]
+            isOneToOne: false
+            referencedRelation: "restaurants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       restaurant_themes: {
         Row: {
           background_color: string | null
