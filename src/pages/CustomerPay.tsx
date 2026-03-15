@@ -141,7 +141,7 @@ const CustomerPay = () => {
         if (newStatus === "completed") {
           if (pollRef.current) clearInterval(pollRef.current);
           if (timerRef.current) clearInterval(timerRef.current);
-          navigate(`/r/${slug}/t/${token}`);
+          navigate(`/r/${slug}/t/${token}/receipt/${payment.id}`);
         }
       })
       .subscribe();
@@ -240,7 +240,7 @@ const CustomerPay = () => {
         if (data?.status === "completed") {
           if (pollRef.current) clearInterval(pollRef.current);
           if (timerRef.current) clearInterval(timerRef.current);
-          navigate(`/r/${slug}/t/${token}`);
+          navigate(`/r/${slug}/t/${token}/receipt/${paymentData.id}`);
         } else if (data?.status === "failed") {
           if (pollRef.current) clearInterval(pollRef.current);
           if (timerRef.current) clearInterval(timerRef.current);
@@ -340,7 +340,7 @@ const CustomerPay = () => {
   }
 
   // ── Cash success screen ──
-  if (cashSent) {
+  if (cashSent && payment) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center gap-5 px-6" style={{ backgroundColor: bgColor, fontFamily }}>
         <div
@@ -356,12 +356,16 @@ const CustomerPay = () => {
         <p className="text-sm font-medium" style={{ color: `${secondaryColor}70` }}>
           Table {table?.table_number}
         </p>
+        <p className="flex items-center gap-2 text-xs" style={{ color: `${secondaryColor}60` }}>
+          <Loader2 className="h-3 w-3 animate-spin" />
+          Waiting for staff to confirm…
+        </p>
         <button
-          onClick={() => navigate(`/r/${slug}/t/${token}`)}
+          onClick={() => navigate(`/r/${slug}/t/${token}/receipt/${payment.id}`)}
           className="mt-4 w-full max-w-xs rounded-2xl py-4 text-base font-semibold text-white"
           style={{ backgroundColor: primaryColor }}
         >
-          Back to Bill
+          View Receipt
         </button>
       </div>
     );

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { useRestaurant } from "@/contexts/RestaurantContext";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -71,7 +71,10 @@ const DashboardTables = () => {
     enabled: !!rid,
   });
 
-  const tokenMap = new Map(qrTokens.map((t: any) => [t.table_id, t]));
+  const tokenMap = useMemo(
+    () => new Map(qrTokens.map((t: any) => [t.table_id, t])),
+    [qrTokens]
+  );
   const billTableIds = new Set(openBills.map((b) => b.table_id));
   const attentionTableIds = new Set(pendingRequests.map((r) => r.table_id));
 
@@ -86,7 +89,13 @@ const DashboardTables = () => {
 
   // Generate QR data URLs for all tables
   const [qrDataUrls, setQrDataUrls] = useState<Record<string, string>>({});
+  const qrGenRef = useRef<string>("");
   useEffect(() => {
+    // Create a stable key to avoid regenerating when nothing changed
+    const key = tables.map(t => t.id).join(",") + "|" + Array.from(tokenMap.values()).map((t: any) => t.token).join(",");
+    if (key === qrGenRef.current || tables.length === 0 || !restaurant?.slug) return;
+    qrGenRef.current = key;
+
     const generate = async () => {
       const urls: Record<string, string> = {};
       for (const tbl of tables) {
@@ -100,8 +109,8 @@ const DashboardTables = () => {
       }
       setQrDataUrls(urls);
     };
-    if (tables.length > 0 && restaurant?.slug) generate();
-  }, [tables, qrTokens, restaurant?.slug]);
+    generate();
+  }, [tables, tokenMap, restaurant?.slug]);
 
   const addMutation = useMutation({
     mutationFn: async () => {
