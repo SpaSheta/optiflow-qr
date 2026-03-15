@@ -121,6 +121,7 @@ export type Database = {
           closed_at: string | null
           id: string
           opened_at: string | null
+          paid_amount: number | null
           restaurant_id: string | null
           status: string | null
           subtotal: number | null
@@ -133,6 +134,7 @@ export type Database = {
           closed_at?: string | null
           id?: string
           opened_at?: string | null
+          paid_amount?: number | null
           restaurant_id?: string | null
           status?: string | null
           subtotal?: number | null
@@ -145,6 +147,7 @@ export type Database = {
           closed_at?: string | null
           id?: string
           opened_at?: string | null
+          paid_amount?: number | null
           restaurant_id?: string | null
           status?: string | null
           subtotal?: number | null
@@ -249,6 +252,89 @@ export type Database = {
             columns: ["restaurant_id"]
             isOneToOne: false
             referencedRelation: "restaurants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      payments: {
+        Row: {
+          amount: number
+          bill_id: string
+          bill_split_id: string | null
+          completed_at: string | null
+          created_at: string | null
+          expires_at: string | null
+          fib_deep_link: string | null
+          fib_qr_url: string | null
+          fib_transaction_id: string | null
+          id: string
+          method: string
+          restaurant_id: string | null
+          status: string
+          table_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          amount: number
+          bill_id: string
+          bill_split_id?: string | null
+          completed_at?: string | null
+          created_at?: string | null
+          expires_at?: string | null
+          fib_deep_link?: string | null
+          fib_qr_url?: string | null
+          fib_transaction_id?: string | null
+          id?: string
+          method: string
+          restaurant_id?: string | null
+          status?: string
+          table_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          amount?: number
+          bill_id?: string
+          bill_split_id?: string | null
+          completed_at?: string | null
+          created_at?: string | null
+          expires_at?: string | null
+          fib_deep_link?: string | null
+          fib_qr_url?: string | null
+          fib_transaction_id?: string | null
+          id?: string
+          method?: string
+          restaurant_id?: string | null
+          status?: string
+          table_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payments_bill_id_fkey"
+            columns: ["bill_id"]
+            isOneToOne: false
+            referencedRelation: "bills"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payments_bill_split_id_fkey"
+            columns: ["bill_split_id"]
+            isOneToOne: false
+            referencedRelation: "bill_splits"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payments_restaurant_id_fkey"
+            columns: ["restaurant_id"]
+            isOneToOne: false
+            referencedRelation: "restaurants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payments_table_id_fkey"
+            columns: ["table_id"]
+            isOneToOne: false
+            referencedRelation: "tables"
             referencedColumns: ["id"]
           },
         ]
