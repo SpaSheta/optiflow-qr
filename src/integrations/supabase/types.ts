@@ -78,6 +78,44 @@ export type Database = {
           },
         ]
       }
+      bill_splits: {
+        Row: {
+          amount: number
+          bill_id: string
+          created_at: string | null
+          id: string
+          item_ids: string[] | null
+          split_method: string
+          status: string
+        }
+        Insert: {
+          amount: number
+          bill_id: string
+          created_at?: string | null
+          id?: string
+          item_ids?: string[] | null
+          split_method: string
+          status?: string
+        }
+        Update: {
+          amount?: number
+          bill_id?: string
+          created_at?: string | null
+          id?: string
+          item_ids?: string[] | null
+          split_method?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bill_splits_bill_id_fkey"
+            columns: ["bill_id"]
+            isOneToOne: false
+            referencedRelation: "bills"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       bills: {
         Row: {
           closed_at: string | null
