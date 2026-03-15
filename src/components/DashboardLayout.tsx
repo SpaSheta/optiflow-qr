@@ -77,7 +77,12 @@ const DashboardLayout = () => {
             )}
           >
             <item.icon className="h-4 w-4 shrink-0" />
-            <span>{item.label}</span>
+            <span className="flex-1 text-left">{item.label}</span>
+            {item.showBadge && pendingCashCount > 0 && (
+              <span className="flex h-5 min-w-[20px] items-center justify-center rounded-full bg-amber-500 px-1.5 text-[10px] font-bold text-white">
+                {pendingCashCount}
+              </span>
+            )}
           </button>
         ))}
       </nav>
