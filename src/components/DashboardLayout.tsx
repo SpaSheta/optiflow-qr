@@ -2,6 +2,7 @@ import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import optiflowIcon from "@/assets/optiflow-icon.png";
 import { useRestaurant } from "@/contexts/RestaurantContext";
 import { supabase } from "@/integrations/supabase/client";
+import { usePendingCashCount } from "@/components/PendingCashPayments";
 import {
   LayoutGrid,
   TableProperties,
@@ -17,7 +18,7 @@ import { cn } from "@/lib/utils";
 
 const NAV = [
   { label: "Overview", icon: LayoutGrid, path: "/dashboard" },
-  { label: "Tables", icon: TableProperties, path: "/dashboard/tables" },
+  { label: "Tables", icon: TableProperties, path: "/dashboard/tables", showBadge: true },
   { label: "Menu", icon: UtensilsCrossed, path: "/dashboard/menu" },
   { label: "Theme", icon: Palette, path: "/dashboard/theme" },
   { label: "Settings", icon: Settings, path: "/dashboard/settings" },
