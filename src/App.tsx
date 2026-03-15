@@ -41,6 +41,7 @@ const App = () => (
             <Route path="/r/:slug/t/:token" element={<CustomerQR />} />
             <Route path="/r/:slug/t/:token/split" element={<CustomerSplit />} />
             <Route path="/r/:slug/t/:token/pay" element={<CustomerPay />} />
+            <Route path="/r/:slug/t/:token/receipt/:paymentId" element={<CustomerReceipt />} />
 
             {/* Super Admin */}
             <Route

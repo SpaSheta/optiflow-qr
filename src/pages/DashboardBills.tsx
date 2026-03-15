@@ -355,6 +355,15 @@ const DashboardBills = () => {
               </Card>
             ))}
 
+            {/* Pending Cash Payments */}
+            {localBill && (
+              <PendingCashPayments
+                tableId={tableId!}
+                billId={localBill.id}
+                formatPrice={formatPrice}
+              />
+            )}
+
             {/* Summary */}
             {localItems.length > 0 && (
               <Card>
