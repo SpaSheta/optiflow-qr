@@ -141,7 +141,7 @@ const CustomerPay = () => {
         if (newStatus === "completed") {
           if (pollRef.current) clearInterval(pollRef.current);
           if (timerRef.current) clearInterval(timerRef.current);
-          navigate(`/r/${slug}/t/${token}`);
+          navigate(`/r/${slug}/t/${token}/receipt/${payment.id}`);
         }
       })
       .subscribe();
