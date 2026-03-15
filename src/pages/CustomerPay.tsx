@@ -240,7 +240,7 @@ const CustomerPay = () => {
         if (data?.status === "completed") {
           if (pollRef.current) clearInterval(pollRef.current);
           if (timerRef.current) clearInterval(timerRef.current);
-          navigate(`/r/${slug}/t/${token}`);
+          navigate(`/r/${slug}/t/${token}/receipt/${paymentData.id}`);
         } else if (data?.status === "failed") {
           if (pollRef.current) clearInterval(pollRef.current);
           if (timerRef.current) clearInterval(timerRef.current);
