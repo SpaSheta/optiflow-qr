@@ -400,19 +400,19 @@ const CustomerQR = () => {
               if (!items.length) return null;
               return (
                 <div key={cat.id} ref={(el) => { categoryRefs.current[cat.id] = el; }} className="mb-6">
-                  <h3 className="mb-3 text-lg font-semibold" style={{ color: secondaryColor }}>{cat.name}</h3>
+                  <h3 className="mb-3 text-lg font-semibold" style={{ color: bodyTextColor }}>{cat.name}</h3>
                   <div className={theme?.menu_layout === "list" ? "space-y-3" : "grid grid-cols-2 gap-3"}>
                     {items.map((item) => (
-                      <div key={item.id} className="overflow-hidden rounded-xl bg-card shadow-sm ring-1 ring-border">
+                      <div key={item.id} className="overflow-hidden rounded-xl shadow-sm ring-1 ring-border" style={{ backgroundColor: cardBgColor }}>
                         {item.image_url && (
                           <img src={item.image_url} alt={item.name} className="h-28 w-full object-cover" />
                         )}
                         <div className="p-3">
-                          <p className="text-sm font-medium" style={{ color: secondaryColor }}>{item.name}</p>
+                          <p className="text-sm font-medium" style={{ color: bodyTextColor }}>{item.name}</p>
                           {item.description && (
-                            <p className="mt-0.5 line-clamp-2 text-xs text-muted-foreground">{item.description}</p>
+                            <p className="mt-0.5 line-clamp-2 text-xs" style={{ color: bodyTextColor, opacity: 0.6 }}>{item.description}</p>
                           )}
-                          <p className="mt-1.5 text-sm font-bold" style={{ color: primaryColor }}>
+                          <p className="mt-1.5 text-sm font-bold" style={{ color: priceTextColor }}>
                             {formatPrice(item.price)}
                           </p>
                         </div>
