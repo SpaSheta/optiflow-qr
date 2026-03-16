@@ -55,9 +55,20 @@ const CustomerQR = () => {
   useEffect(() => {
     if (!theme) return;
     const root = document.documentElement;
-    if (theme.primary_color) root.style.setProperty("--qr-primary", theme.primary_color);
-    if (theme.secondary_color) root.style.setProperty("--qr-secondary", theme.secondary_color);
-    if (theme.background_color) root.style.setProperty("--qr-bg", theme.background_color);
+    const props: Record<string, string> = {
+      "--page-bg": theme.background_color || "#F5F5F0",
+      "--header-bg": theme.header_bg_color || theme.secondary_color || "#1E3A5F",
+      "--header-text": theme.header_text_color || "#FFFFFF",
+      "--tab-active": theme.tab_active_color || theme.primary_color || "#0FBCB0",
+      "--card-bg": theme.card_bg_color || "#FFFFFF",
+      "--body-text": theme.body_text_color || "#1F2937",
+      "--price-color": theme.price_color || theme.primary_color || "#0FBCB0",
+      "--accent": theme.primary_color || "#0FBCB0",
+      "--qr-primary": theme.primary_color || "#F5A623",
+      "--qr-secondary": theme.secondary_color || "#1E3A5F",
+      "--qr-bg": theme.background_color || "#F5F5F0",
+    };
+    Object.entries(props).forEach(([k, v]) => root.style.setProperty(k, v));
 
     // Load Google Font
     if (theme.font_family) {
@@ -71,9 +82,7 @@ const CustomerQR = () => {
     }
 
     return () => {
-      root.style.removeProperty("--qr-primary");
-      root.style.removeProperty("--qr-secondary");
-      root.style.removeProperty("--qr-bg");
+      Object.keys(props).forEach((k) => root.style.removeProperty(k));
       const el = document.getElementById("qr-google-font");
       if (el) el.remove();
     };
