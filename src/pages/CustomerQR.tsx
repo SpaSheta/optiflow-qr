@@ -385,9 +385,9 @@ const CustomerQR = () => {
                   onClick={() => scrollToCategory(cat.id)}
                   className="shrink-0 rounded-full px-4 py-1.5 text-xs font-medium transition-all"
                   style={
-                    activeCategory === cat.id
-                      ? { backgroundColor: primaryColor, color: "#fff" }
-                      : { backgroundColor: `${secondaryColor}12`, color: secondaryColor }
+                     activeCategory === cat.id
+                       ? { backgroundColor: tabActiveColor, color: "#fff" }
+                       : { backgroundColor: `${headerBg}12`, color: bodyTextColor }
                   }
                 >
                   {cat.name}
