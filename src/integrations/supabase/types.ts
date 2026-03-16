@@ -529,6 +529,7 @@ export type Database = {
         Row: {
           created_at: string | null
           id: string
+          qr_settings: Json | null
           qr_url: string | null
           regenerated_at: string | null
           restaurant_id: string | null
@@ -538,6 +539,7 @@ export type Database = {
         Insert: {
           created_at?: string | null
           id?: string
+          qr_settings?: Json | null
           qr_url?: string | null
           regenerated_at?: string | null
           restaurant_id?: string | null
@@ -547,6 +549,7 @@ export type Database = {
         Update: {
           created_at?: string | null
           id?: string
+          qr_settings?: Json | null
           qr_url?: string | null
           regenerated_at?: string | null
           restaurant_id?: string | null
