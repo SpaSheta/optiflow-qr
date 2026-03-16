@@ -433,38 +433,38 @@ const CustomerQR = () => {
                 href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(restaurant.address)}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-start gap-3 rounded-xl bg-card p-4 shadow-sm ring-1 ring-border"
+                className="flex items-start gap-3 rounded-xl p-4 shadow-sm ring-1 ring-border" style={{ backgroundColor: cardBgColor }}
               >
-                <MapPin className="mt-0.5 h-5 w-5 shrink-0" style={{ color: primaryColor }} />
-                <span className="text-sm" style={{ color: secondaryColor }}>{restaurant.address}</span>
+                <MapPin className="mt-0.5 h-5 w-5 shrink-0" style={{ color: accentColor }} />
+                <span className="text-sm" style={{ color: bodyTextColor }}>{restaurant.address}</span>
               </a>
             )}
             {restaurant?.phone && (
               <a
                 href={`tel:${restaurant.phone}`}
-                className="flex items-center gap-3 rounded-xl bg-card p-4 shadow-sm ring-1 ring-border"
+                className="flex items-center gap-3 rounded-xl p-4 shadow-sm ring-1 ring-border" style={{ backgroundColor: cardBgColor }}
               >
-                <Phone className="h-5 w-5 shrink-0" style={{ color: primaryColor }} />
-                <span className="text-sm" style={{ color: secondaryColor }}>{restaurant.phone}</span>
+                <Phone className="h-5 w-5 shrink-0" style={{ color: accentColor }} />
+                <span className="text-sm" style={{ color: bodyTextColor }}>{restaurant.phone}</span>
               </a>
             )}
             <div className="flex justify-center gap-4 pt-2">
               {restaurant?.instagram && (
                 <a href={`https://instagram.com/${restaurant.instagram}`} target="_blank" rel="noopener noreferrer"
-                  className="flex h-12 w-12 items-center justify-center rounded-full" style={{ backgroundColor: `${primaryColor}20` }}>
-                  <Instagram className="h-5 w-5" style={{ color: primaryColor }} />
+                  className="flex h-12 w-12 items-center justify-center rounded-full" style={{ backgroundColor: `${accentColor}20` }}>
+                  <Instagram className="h-5 w-5" style={{ color: accentColor }} />
                 </a>
               )}
               {restaurant?.facebook && (
                 <a href={restaurant.facebook} target="_blank" rel="noopener noreferrer"
-                  className="flex h-12 w-12 items-center justify-center rounded-full" style={{ backgroundColor: `${primaryColor}20` }}>
-                  <Facebook className="h-5 w-5" style={{ color: primaryColor }} />
+                  className="flex h-12 w-12 items-center justify-center rounded-full" style={{ backgroundColor: `${accentColor}20` }}>
+                  <Facebook className="h-5 w-5" style={{ color: accentColor }} />
                 </a>
               )}
               {restaurant?.website && (
                 <a href={restaurant.website} target="_blank" rel="noopener noreferrer"
-                  className="flex h-12 w-12 items-center justify-center rounded-full" style={{ backgroundColor: `${primaryColor}20` }}>
-                  <Globe className="h-5 w-5" style={{ color: primaryColor }} />
+                  className="flex h-12 w-12 items-center justify-center rounded-full" style={{ backgroundColor: `${accentColor}20` }}>
+                  <Globe className="h-5 w-5" style={{ color: accentColor }} />
                 </a>
               )}
             </div>
