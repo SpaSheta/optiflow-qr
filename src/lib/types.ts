@@ -32,6 +32,12 @@ export interface RestaurantTheme {
   font_family: string;
   intro_video_url: string | null;
   menu_layout: string;
+  header_bg_color: string | null;
+  header_text_color: string | null;
+  tab_active_color: string | null;
+  card_bg_color: string | null;
+  body_text_color: string | null;
+  price_color: string | null;
 }
 
 export interface Table {
