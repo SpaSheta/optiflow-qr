@@ -340,14 +340,14 @@ const CustomerQR = () => {
                 </div>
 
                 {/* Summary */}
-                <div className="rounded-xl bg-card p-4 shadow-sm ring-1 ring-border">
-                  <div className="flex justify-between text-sm text-muted-foreground">
+                <div className="rounded-xl p-4 shadow-sm ring-1 ring-border" style={{ backgroundColor: cardBgColor }}>
+                  <div className="flex justify-between text-sm" style={{ color: bodyTextColor, opacity: 0.6 }}>
                     <span>Subtotal</span><span>{formatPrice(bill.subtotal)}</span>
                   </div>
-                  <div className="flex justify-between text-sm text-muted-foreground">
+                  <div className="flex justify-between text-sm" style={{ color: bodyTextColor, opacity: 0.6 }}>
                     <span>Tax</span><span>{formatPrice(bill.tax_amount)}</span>
                   </div>
-                  <div className="mt-2 flex justify-between border-t pt-2 text-base font-bold" style={{ color: secondaryColor }}>
+                  <div className="mt-2 flex justify-between border-t pt-2 text-base font-bold" style={{ color: bodyTextColor }}>
                     <span>Total</span><span>{formatPrice(bill.total)}</span>
                   </div>
                 </div>
