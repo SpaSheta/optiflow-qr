@@ -301,7 +301,7 @@ const CustomerQR = () => {
             style={
               activeTab === t.key
                 ? { backgroundColor: tabActiveColor, color: "#fff" }
-                : { backgroundColor: `${headerBg}12`, color: bodyTextColor }
+                : { backgroundColor: "rgba(0,0,0,0.06)", color: bodyTextColor }
             }
           >
             {t.icon} {t.label}
