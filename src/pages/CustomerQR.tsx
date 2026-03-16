@@ -209,6 +209,13 @@ const CustomerQR = () => {
   const bgColor = theme?.background_color || "#F5F5F0";
   const secondaryColor = theme?.secondary_color || "#1E3A5F";
   const fontFamily = theme?.font_family || "Inter";
+  const headerBg = theme?.header_bg_color || secondaryColor;
+  const headerTextColor = theme?.header_text_color || "#FFFFFF";
+  const tabActiveColor = theme?.tab_active_color || primaryColor;
+  const cardBgColor = theme?.card_bg_color || "#FFFFFF";
+  const bodyTextColor = theme?.body_text_color || "#1F2937";
+  const priceTextColor = theme?.price_color || primaryColor;
+  const accentColor = primaryColor;
 
   const menuByCategory = useMemo(() => {
     const map: Record<string, MenuItem[]> = {};
@@ -258,7 +265,7 @@ const CustomerQR = () => {
   return (
     <div className="min-h-screen pb-24" style={{ backgroundColor: bgColor, fontFamily }}>
       {/* HEADER */}
-      <header className="flex flex-col items-center px-5 pt-8 pb-4">
+      <header className="flex flex-col items-center px-5 pt-8 pb-4" style={{ backgroundColor: headerBg }}>
         {theme?.logo_url && (
           <img src={theme.logo_url} alt={restaurant?.name} className="mb-3 h-20 w-20 rounded-2xl object-contain" />
         )}
@@ -269,10 +276,10 @@ const CustomerQR = () => {
             autoPlay muted loop playsInline
           />
         )}
-        <h1 className="mb-0.5 text-2xl font-bold" style={{ color: secondaryColor, fontFamily }}>
+        <h1 className="mb-0.5 text-2xl font-bold" style={{ color: headerTextColor, fontFamily }}>
           {restaurant?.name}
         </h1>
-        <p className="text-sm" style={{ color: `${secondaryColor}99` }}>Table {table?.table_number}</p>
+        <p className="text-sm" style={{ color: headerTextColor, opacity: 0.7 }}>Table {table?.table_number}</p>
       </header>
 
       {/* STICKY TAB BAR */}
@@ -284,8 +291,8 @@ const CustomerQR = () => {
             className="flex items-center gap-1.5 rounded-full px-5 py-2 text-sm font-medium transition-all"
             style={
               activeTab === t.key
-                ? { backgroundColor: primaryColor, color: "#fff" }
-                : { backgroundColor: `${secondaryColor}12`, color: secondaryColor }
+                ? { backgroundColor: tabActiveColor, color: "#fff" }
+                : { backgroundColor: `${headerBg}12`, color: bodyTextColor }
             }
           >
             {t.icon} {t.label}
@@ -299,7 +306,7 @@ const CustomerQR = () => {
           <section className="space-y-4">
             {updating && (
               <div className="flex items-center justify-center gap-2 text-xs" style={{ color: secondaryColor }}>
-                <Loader2 className="h-3 w-3 animate-spin" /> Updating...
+                 <Loader2 className="h-3 w-3 animate-spin" /> Updating...
               </div>
             )}
 
@@ -320,12 +327,12 @@ const CustomerQR = () => {
 
                 <div className="space-y-2">
                   {billItems.map((item) => (
-                    <div key={item.id} className="flex items-center justify-between rounded-xl bg-card p-4 shadow-sm ring-1 ring-border">
+                    <div key={item.id} className="flex items-center justify-between rounded-xl p-4 shadow-sm ring-1 ring-border" style={{ backgroundColor: cardBgColor }}>
                       <div>
-                        <p className="text-sm font-medium" style={{ color: secondaryColor }}>{item.name}</p>
-                        <p className="text-xs text-muted-foreground">× {item.quantity}</p>
+                        <p className="text-sm font-medium" style={{ color: bodyTextColor }}>{item.name}</p>
+                        <p className="text-xs" style={{ color: bodyTextColor, opacity: 0.5 }}>× {item.quantity}</p>
                       </div>
-                      <p className="text-sm font-semibold" style={{ color: secondaryColor }}>
+                      <p className="text-sm font-semibold" style={{ color: priceTextColor }}>
                         {formatPrice(item.total_price)}
                       </p>
                     </div>
@@ -333,14 +340,14 @@ const CustomerQR = () => {
                 </div>
 
                 {/* Summary */}
-                <div className="rounded-xl bg-card p-4 shadow-sm ring-1 ring-border">
-                  <div className="flex justify-between text-sm text-muted-foreground">
+                <div className="rounded-xl p-4 shadow-sm ring-1 ring-border" style={{ backgroundColor: cardBgColor }}>
+                  <div className="flex justify-between text-sm" style={{ color: bodyTextColor, opacity: 0.6 }}>
                     <span>Subtotal</span><span>{formatPrice(bill.subtotal)}</span>
                   </div>
-                  <div className="flex justify-between text-sm text-muted-foreground">
+                  <div className="flex justify-between text-sm" style={{ color: bodyTextColor, opacity: 0.6 }}>
                     <span>Tax</span><span>{formatPrice(bill.tax_amount)}</span>
                   </div>
-                  <div className="mt-2 flex justify-between border-t pt-2 text-base font-bold" style={{ color: secondaryColor }}>
+                  <div className="mt-2 flex justify-between border-t pt-2 text-base font-bold" style={{ color: bodyTextColor }}>
                     <span>Total</span><span>{formatPrice(bill.total)}</span>
                   </div>
                 </div>
@@ -349,13 +356,14 @@ const CustomerQR = () => {
                   <Button
                     variant="outline"
                     className="flex-1 rounded-xl"
+                    style={{ borderColor: accentColor, color: accentColor }}
                     onClick={() => navigate(`/r/${slug}/t/${token}/split`)}
                   >
                     Split Bill
                   </Button>
                   <Button
                     className="flex-1 rounded-xl text-white"
-                    style={{ backgroundColor: primaryColor }}
+                    style={{ backgroundColor: accentColor }}
                     onClick={() => navigate(`/r/${slug}/t/${token}/pay`)}
                   >
                     Pay Now
@@ -377,9 +385,9 @@ const CustomerQR = () => {
                   onClick={() => scrollToCategory(cat.id)}
                   className="shrink-0 rounded-full px-4 py-1.5 text-xs font-medium transition-all"
                   style={
-                    activeCategory === cat.id
-                      ? { backgroundColor: primaryColor, color: "#fff" }
-                      : { backgroundColor: `${secondaryColor}12`, color: secondaryColor }
+                     activeCategory === cat.id
+                       ? { backgroundColor: tabActiveColor, color: "#fff" }
+                       : { backgroundColor: `${headerBg}12`, color: bodyTextColor }
                   }
                 >
                   {cat.name}
@@ -392,19 +400,19 @@ const CustomerQR = () => {
               if (!items.length) return null;
               return (
                 <div key={cat.id} ref={(el) => { categoryRefs.current[cat.id] = el; }} className="mb-6">
-                  <h3 className="mb-3 text-lg font-semibold" style={{ color: secondaryColor }}>{cat.name}</h3>
+                  <h3 className="mb-3 text-lg font-semibold" style={{ color: bodyTextColor }}>{cat.name}</h3>
                   <div className={theme?.menu_layout === "list" ? "space-y-3" : "grid grid-cols-2 gap-3"}>
                     {items.map((item) => (
-                      <div key={item.id} className="overflow-hidden rounded-xl bg-card shadow-sm ring-1 ring-border">
+                      <div key={item.id} className="overflow-hidden rounded-xl shadow-sm ring-1 ring-border" style={{ backgroundColor: cardBgColor }}>
                         {item.image_url && (
                           <img src={item.image_url} alt={item.name} className="h-28 w-full object-cover" />
                         )}
                         <div className="p-3">
-                          <p className="text-sm font-medium" style={{ color: secondaryColor }}>{item.name}</p>
+                          <p className="text-sm font-medium" style={{ color: bodyTextColor }}>{item.name}</p>
                           {item.description && (
-                            <p className="mt-0.5 line-clamp-2 text-xs text-muted-foreground">{item.description}</p>
+                            <p className="mt-0.5 line-clamp-2 text-xs" style={{ color: bodyTextColor, opacity: 0.6 }}>{item.description}</p>
                           )}
-                          <p className="mt-1.5 text-sm font-bold" style={{ color: primaryColor }}>
+                          <p className="mt-1.5 text-sm font-bold" style={{ color: priceTextColor }}>
                             {formatPrice(item.price)}
                           </p>
                         </div>
@@ -425,38 +433,38 @@ const CustomerQR = () => {
                 href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(restaurant.address)}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-start gap-3 rounded-xl bg-card p-4 shadow-sm ring-1 ring-border"
+                className="flex items-start gap-3 rounded-xl p-4 shadow-sm ring-1 ring-border" style={{ backgroundColor: cardBgColor }}
               >
-                <MapPin className="mt-0.5 h-5 w-5 shrink-0" style={{ color: primaryColor }} />
-                <span className="text-sm" style={{ color: secondaryColor }}>{restaurant.address}</span>
+                <MapPin className="mt-0.5 h-5 w-5 shrink-0" style={{ color: accentColor }} />
+                <span className="text-sm" style={{ color: bodyTextColor }}>{restaurant.address}</span>
               </a>
             )}
             {restaurant?.phone && (
               <a
                 href={`tel:${restaurant.phone}`}
-                className="flex items-center gap-3 rounded-xl bg-card p-4 shadow-sm ring-1 ring-border"
+                className="flex items-center gap-3 rounded-xl p-4 shadow-sm ring-1 ring-border" style={{ backgroundColor: cardBgColor }}
               >
-                <Phone className="h-5 w-5 shrink-0" style={{ color: primaryColor }} />
-                <span className="text-sm" style={{ color: secondaryColor }}>{restaurant.phone}</span>
+                <Phone className="h-5 w-5 shrink-0" style={{ color: accentColor }} />
+                <span className="text-sm" style={{ color: bodyTextColor }}>{restaurant.phone}</span>
               </a>
             )}
             <div className="flex justify-center gap-4 pt-2">
               {restaurant?.instagram && (
                 <a href={`https://instagram.com/${restaurant.instagram}`} target="_blank" rel="noopener noreferrer"
-                  className="flex h-12 w-12 items-center justify-center rounded-full" style={{ backgroundColor: `${primaryColor}20` }}>
-                  <Instagram className="h-5 w-5" style={{ color: primaryColor }} />
+                  className="flex h-12 w-12 items-center justify-center rounded-full" style={{ backgroundColor: `${accentColor}20` }}>
+                  <Instagram className="h-5 w-5" style={{ color: accentColor }} />
                 </a>
               )}
               {restaurant?.facebook && (
                 <a href={restaurant.facebook} target="_blank" rel="noopener noreferrer"
-                  className="flex h-12 w-12 items-center justify-center rounded-full" style={{ backgroundColor: `${primaryColor}20` }}>
-                  <Facebook className="h-5 w-5" style={{ color: primaryColor }} />
+                  className="flex h-12 w-12 items-center justify-center rounded-full" style={{ backgroundColor: `${accentColor}20` }}>
+                  <Facebook className="h-5 w-5" style={{ color: accentColor }} />
                 </a>
               )}
               {restaurant?.website && (
                 <a href={restaurant.website} target="_blank" rel="noopener noreferrer"
-                  className="flex h-12 w-12 items-center justify-center rounded-full" style={{ backgroundColor: `${primaryColor}20` }}>
-                  <Globe className="h-5 w-5" style={{ color: primaryColor }} />
+                  className="flex h-12 w-12 items-center justify-center rounded-full" style={{ backgroundColor: `${accentColor}20` }}>
+                  <Globe className="h-5 w-5" style={{ color: accentColor }} />
                 </a>
               )}
             </div>
@@ -468,7 +476,7 @@ const CustomerQR = () => {
       <button
         onClick={() => setWaiterSheetOpen(true)}
         className="fixed bottom-6 right-6 z-40 flex h-14 w-14 items-center justify-center rounded-full shadow-lg transition-transform active:scale-95"
-        style={{ backgroundColor: primaryColor, color: "#fff" }}
+        style={{ backgroundColor: accentColor, color: "#fff" }}
       >
         <Bell className="h-6 w-6" />
       </button>
