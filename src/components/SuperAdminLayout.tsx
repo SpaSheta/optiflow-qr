@@ -12,7 +12,6 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
-import { Badge } from "@/components/ui/badge";
 
 const NAV = [
   { label: "Overview", icon: LayoutGrid, path: "/super-admin" },
@@ -36,23 +35,23 @@ const SuperAdminLayout = () => {
       : location.pathname.startsWith(path);
 
   const sidebar = (
-    <div className="flex h-full flex-col" style={{ background: "#0F1F3D" }}>
+    <div className="flex h-full flex-col bg-sidebar">
       {/* Header */}
-      <div className="flex h-14 items-center gap-2 border-b border-white/10 px-4">
+      <div className="flex h-16 items-center gap-2 border-b border-sidebar-border px-5">
         <img src={optiflowIcon} alt="OptiFlow" className="h-7 w-7" />
-        <span className="text-lg font-bold text-white" style={{ fontFamily: "var(--restaurant-name)" }}>
+        <span className="text-[22px] font-extrabold text-white">
           OptiFlow
         </span>
-        <Zap className="h-3.5 w-3.5 text-amber-400" />
+        <Zap className="h-3.5 w-3.5 text-warning" />
         <button className="ml-auto md:hidden" onClick={() => setMobileOpen(false)}>
           <X className="h-5 w-5 text-white/70" />
         </button>
       </div>
 
-      <div className="px-4 py-2">
-        <Badge className="bg-amber-500/20 text-amber-400 hover:bg-amber-500/30 border-amber-500/30 text-[10px] font-semibold uppercase tracking-wider">
+      <div className="px-5 py-2">
+        <span className="badge-pending text-[10px] font-bold uppercase tracking-wider">
           Super Admin
-        </Badge>
+        </span>
       </div>
 
       {/* Nav */}
@@ -62,9 +61,9 @@ const SuperAdminLayout = () => {
             key={item.path}
             onClick={() => { navigate(item.path); setMobileOpen(false); }}
             className={cn(
-              "flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors",
+              "flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-colors",
               isActive(item.path)
-                ? "bg-white/10 font-semibold text-white"
+                ? "bg-primary/15 border-l-[3px] border-primary font-bold text-primary"
                 : "text-white/60 hover:bg-white/5 hover:text-white/80"
             )}
           >
@@ -75,19 +74,19 @@ const SuperAdminLayout = () => {
       </nav>
 
       {/* Bottom */}
-      <div className="border-t border-white/10 p-3">
+      <div className="border-t border-sidebar-border p-3">
         <div className="mb-2 flex items-center gap-2 px-3">
-          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-amber-500/20 text-xs font-bold text-amber-400">
+          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-warning/20 text-xs font-bold text-warning">
             SA
           </div>
           <div className="min-w-0 flex-1">
             <p className="truncate text-xs font-medium text-white/80">{user?.email}</p>
-            <p className="text-[10px] text-amber-400">Super Admin</p>
+            <p className="text-[10px] text-warning">Super Admin</p>
           </div>
         </div>
         <button
           onClick={handleLogout}
-          className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-white/60 hover:bg-white/5 hover:text-white/80"
+          className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-white/60 hover:bg-white/5 hover:text-white/80"
         >
           <LogOut className="h-4 w-4 shrink-0" />
           <span>Sign Out</span>
@@ -99,7 +98,7 @@ const SuperAdminLayout = () => {
   return (
     <div className="flex min-h-screen bg-background">
       {/* Desktop sidebar */}
-      <aside className="hidden w-60 shrink-0 md:block">
+      <aside className="hidden w-64 shrink-0 md:block">
         {sidebar}
       </aside>
 
@@ -108,7 +107,7 @@ const SuperAdminLayout = () => {
         <div className="fixed inset-0 z-40 bg-foreground/30 md:hidden" onClick={() => setMobileOpen(false)} />
       )}
       <aside className={cn(
-        "fixed inset-y-0 left-0 z-50 w-60 transition-transform md:hidden",
+        "fixed inset-y-0 left-0 z-50 w-64 transition-transform md:hidden",
         mobileOpen ? "translate-x-0" : "-translate-x-full"
       )}>
         {sidebar}
@@ -121,12 +120,12 @@ const SuperAdminLayout = () => {
             <Menu className="h-5 w-5 text-foreground" />
           </button>
           <img src={optiflowIcon} alt="OptiFlow" className="ml-3 h-6 w-6" />
-          <span className="ml-1.5 text-base font-bold text-foreground" style={{ fontFamily: "var(--restaurant-name)" }}>
+          <span className="ml-1.5 text-base font-extrabold text-foreground">
             OptiFlow
           </span>
-          <Zap className="ml-1 h-3.5 w-3.5 text-amber-500" />
+          <Zap className="ml-1 h-3.5 w-3.5 text-warning" />
         </header>
-        <main className="flex-1 overflow-auto p-4 md:p-6">
+        <main className="flex-1 overflow-auto p-4 md:p-8">
           <Outlet />
         </main>
       </div>

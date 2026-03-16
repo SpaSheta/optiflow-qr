@@ -42,21 +42,18 @@ const DashboardLayout = () => {
       : location.pathname.startsWith(path);
 
   const sidebar = (
-    <div className="flex h-full flex-col">
+    <div className="flex h-full flex-col bg-sidebar">
       {/* Logo */}
-      <div className="flex h-14 items-center gap-2.5 border-b border-sidebar-border px-4">
+      <div className="flex h-16 items-center gap-2.5 border-b border-sidebar-border px-5">
         <img src={optiflowIcon} alt="OptiFlow" className="h-7 w-7" />
-        <span
-          className="text-lg font-bold text-sidebar-foreground"
-          style={{ fontFamily: "var(--restaurant-name)" }}
-        >
+        <span className="text-[22px] font-extrabold text-white">
           OptiFlow
         </span>
         <button
           className="ml-auto md:hidden"
           onClick={() => setMobileOpen(false)}
         >
-          <X className="h-5 w-5 text-sidebar-foreground" />
+          <X className="h-5 w-5 text-white/70" />
         </button>
       </div>
 
@@ -70,16 +67,16 @@ const DashboardLayout = () => {
               setMobileOpen(false);
             }}
             className={cn(
-              "flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors",
+              "flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-colors",
               isActive(item.path)
-                ? "bg-sidebar-accent font-semibold text-sidebar-primary"
-                : "text-sidebar-foreground hover:bg-sidebar-accent"
+                ? "bg-primary/15 border-l-[3px] border-primary font-bold text-primary"
+                : "text-white/70 hover:bg-white/5"
             )}
           >
             <item.icon className="h-4 w-4 shrink-0" />
             <span className="flex-1 text-left">{item.label}</span>
             {item.showBadge && pendingCashCount > 0 && (
-              <span className="flex h-5 min-w-[20px] items-center justify-center rounded-full bg-amber-500 px-1.5 text-[10px] font-bold text-white">
+              <span className="flex h-5 min-w-[20px] items-center justify-center rounded-full bg-warning px-1.5 text-[10px] font-bold text-white">
                 {pendingCashCount}
               </span>
             )}
@@ -89,12 +86,12 @@ const DashboardLayout = () => {
 
       {/* Bottom */}
       <div className="border-t border-sidebar-border p-3">
-        <p className="mb-2 truncate px-3 text-xs font-medium text-muted-foreground">
+        <p className="mb-2 truncate px-3 text-label text-white/50">
           {restaurant?.name}
         </p>
         <button
           onClick={handleLogout}
-          className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-sidebar-foreground hover:bg-sidebar-accent"
+          className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-white/70 hover:bg-white/5"
         >
           <LogOut className="h-4 w-4 shrink-0" />
           <span>Sign Out</span>
@@ -106,7 +103,7 @@ const DashboardLayout = () => {
   return (
     <div className="flex min-h-screen bg-background">
       {/* Desktop sidebar */}
-      <aside className="hidden w-56 shrink-0 border-r border-sidebar-border bg-sidebar md:block">
+      <aside className="hidden w-64 shrink-0 md:block">
         {sidebar}
       </aside>
 
@@ -119,7 +116,7 @@ const DashboardLayout = () => {
       )}
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-50 w-56 bg-sidebar transition-transform md:hidden",
+          "fixed inset-y-0 left-0 z-50 w-64 transition-transform md:hidden",
           mobileOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
@@ -134,14 +131,11 @@ const DashboardLayout = () => {
             <Menu className="h-5 w-5 text-foreground" />
           </button>
           <img src={optiflowIcon} alt="OptiFlow" className="ml-3 h-6 w-6" />
-          <span
-            className="ml-1.5 text-base font-bold text-foreground"
-            style={{ fontFamily: "var(--restaurant-name)" }}
-          >
+          <span className="ml-1.5 text-base font-extrabold text-foreground">
             OptiFlow
           </span>
         </header>
-        <main className="flex-1 overflow-auto p-4 md:p-6">
+        <main className="flex-1 overflow-auto p-4 md:p-8">
           <Outlet />
         </main>
       </div>
