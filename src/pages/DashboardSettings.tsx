@@ -111,7 +111,7 @@ const DashboardSettings = () => {
 
   return (
     <div className="mx-auto max-w-2xl">
-      <h1 className="mb-6 text-2xl font-bold text-foreground" style={{ fontFamily: "var(--restaurant-name)" }}>
+      <h1 className="text-h1 text-foreground mb-8">
         Settings
       </h1>
 

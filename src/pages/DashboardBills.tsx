@@ -267,7 +267,7 @@ const DashboardBills = () => {
         >
           <ArrowLeft className="h-4 w-4" />
         </button>
-        <h1 className="text-xl font-bold text-foreground" style={{ fontFamily: "var(--restaurant-name)" }}>
+        <h1 className="text-h2 text-foreground">
           Table {table?.table_number ?? "…"}
         </h1>
         {localBill && (

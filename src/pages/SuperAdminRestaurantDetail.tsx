@@ -368,7 +368,7 @@ const SuperAdminRestaurantDetail = () => {
       </button>
 
       <div className="mb-6 flex flex-wrap items-center gap-3">
-        <h1 className="text-2xl font-bold text-foreground" style={{ fontFamily: "var(--restaurant-name)" }}>
+        <h1 className="text-h1 text-foreground">
           {restaurant.name}
         </h1>
         {statusBadge(restaurant.status)}
