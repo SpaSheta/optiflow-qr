@@ -546,7 +546,7 @@ const CustomerQR = () => {
                 size="sm"
                 disabled={waiterSending || !waiterMessage.trim()}
                 onClick={() => sendWaiterRequest("other", waiterMessage)}
-                style={{ backgroundColor: primaryColor }}
+                style={{ backgroundColor: accentColor }}
                 className="text-white"
               >
                 {waiterSending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Send"}
