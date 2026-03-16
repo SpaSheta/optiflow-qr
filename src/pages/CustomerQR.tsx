@@ -306,7 +306,7 @@ const CustomerQR = () => {
           <section className="space-y-4">
             {updating && (
               <div className="flex items-center justify-center gap-2 text-xs" style={{ color: secondaryColor }}>
-                <Loader2 className="h-3 w-3 animate-spin" /> Updating...
+                 <Loader2 className="h-3 w-3 animate-spin" /> Updating...
               </div>
             )}
 
