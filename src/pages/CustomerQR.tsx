@@ -265,7 +265,7 @@ const CustomerQR = () => {
   return (
     <div className="min-h-screen pb-24" style={{ backgroundColor: bgColor, fontFamily }}>
       {/* HEADER */}
-      <header className="flex flex-col items-center px-5 pt-8 pb-4">
+      <header className="flex flex-col items-center px-5 pt-8 pb-4" style={{ backgroundColor: headerBg }}>
         {theme?.logo_url && (
           <img src={theme.logo_url} alt={restaurant?.name} className="mb-3 h-20 w-20 rounded-2xl object-contain" />
         )}
@@ -276,10 +276,10 @@ const CustomerQR = () => {
             autoPlay muted loop playsInline
           />
         )}
-        <h1 className="mb-0.5 text-2xl font-bold" style={{ color: secondaryColor, fontFamily }}>
+        <h1 className="mb-0.5 text-2xl font-bold" style={{ color: headerTextColor, fontFamily }}>
           {restaurant?.name}
         </h1>
-        <p className="text-sm" style={{ color: `${secondaryColor}99` }}>Table {table?.table_number}</p>
+        <p className="text-sm" style={{ color: headerTextColor, opacity: 0.7 }}>Table {table?.table_number}</p>
       </header>
 
       {/* STICKY TAB BAR */}
