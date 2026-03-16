@@ -25,6 +25,7 @@ import SuperAdminRestaurantNew from "@/pages/SuperAdminRestaurantNew";
 import SuperAdminRestaurantDetail from "@/pages/SuperAdminRestaurantDetail";
 import SuperAdminRestaurantTables from "@/pages/SuperAdminRestaurantTables";
 import NotFound from "@/pages/NotFound";
+import LandingPage from "@/pages/LandingPage";
 
 const queryClient = new QueryClient();
 
