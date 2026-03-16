@@ -75,8 +75,8 @@ const App = () => (
               <Route path="/dashboard/settings" element={<DashboardSettings />} />
             </Route>
 
-            {/* Redirect root to login */}
-            <Route path="/" element={<Login />} />
+            {/* Public landing page */}
+            <Route path="/" element={<LandingPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
