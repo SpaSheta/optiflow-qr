@@ -391,36 +391,54 @@ export type Database = {
       restaurant_themes: {
         Row: {
           background_color: string | null
+          body_text_color: string | null
+          card_bg_color: string | null
           font_family: string | null
+          header_bg_color: string | null
+          header_text_color: string | null
           id: string
           intro_video_url: string | null
           logo_url: string | null
           menu_layout: string | null
+          price_color: string | null
           primary_color: string | null
           restaurant_id: string | null
           secondary_color: string | null
+          tab_active_color: string | null
         }
         Insert: {
           background_color?: string | null
+          body_text_color?: string | null
+          card_bg_color?: string | null
           font_family?: string | null
+          header_bg_color?: string | null
+          header_text_color?: string | null
           id?: string
           intro_video_url?: string | null
           logo_url?: string | null
           menu_layout?: string | null
+          price_color?: string | null
           primary_color?: string | null
           restaurant_id?: string | null
           secondary_color?: string | null
+          tab_active_color?: string | null
         }
         Update: {
           background_color?: string | null
+          body_text_color?: string | null
+          card_bg_color?: string | null
           font_family?: string | null
+          header_bg_color?: string | null
+          header_text_color?: string | null
           id?: string
           intro_video_url?: string | null
           logo_url?: string | null
           menu_layout?: string | null
+          price_color?: string | null
           primary_color?: string | null
           restaurant_id?: string | null
           secondary_color?: string | null
+          tab_active_color?: string | null
         }
         Relationships: [
           {
