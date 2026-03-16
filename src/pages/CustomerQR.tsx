@@ -356,13 +356,14 @@ const CustomerQR = () => {
                   <Button
                     variant="outline"
                     className="flex-1 rounded-xl"
+                    style={{ borderColor: accentColor, color: accentColor }}
                     onClick={() => navigate(`/r/${slug}/t/${token}/split`)}
                   >
                     Split Bill
                   </Button>
                   <Button
                     className="flex-1 rounded-xl text-white"
-                    style={{ backgroundColor: primaryColor }}
+                    style={{ backgroundColor: accentColor }}
                     onClick={() => navigate(`/r/${slug}/t/${token}/pay`)}
                   >
                     Pay Now
