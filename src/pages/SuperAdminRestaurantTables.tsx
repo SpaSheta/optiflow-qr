@@ -1,35 +1,22 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
-import {
-  ArrowLeft,
-  Plus,
-  Download,
-  Copy,
-  RefreshCw,
-  Printer,
-  PackageOpen,
-  Trash2,
-} from "lucide-react";
-import { useState, useEffect } from "react";
+import { ArrowLeft, Plus, Trash2, PackageOpen } from "lucide-react";
+import { useState, useEffect, useMemo } from "react";
 import { cn } from "@/lib/utils";
+import QrStudio from "@/components/QrStudio";
 import QRCode from "qrcode";
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
@@ -75,36 +62,27 @@ const SuperAdminRestaurantTables = () => {
     enabled: !!restaurantId,
   });
 
-  const tokenMap = new Map(qrTokens.map((t: any) => [t.table_id, t]));
+  const { data: theme } = useQuery({
+    queryKey: ["sa-restaurant-theme", restaurantId],
+    queryFn: async () => {
+      const { data } = await supabase.from("restaurant_themes").select("*").eq("restaurant_id", restaurantId!).maybeSingle();
+      return data;
+    },
+    enabled: !!restaurantId,
+  });
+
+  const tokenMap = useMemo(() => new Map(qrTokens.map((t: any) => [t.table_id, t])), [qrTokens]);
   const billTableIds = new Set(openBills.map((b) => b.table_id));
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [qrDataUrl, setQrDataUrl] = useState("");
+  const [checkedIds, setCheckedIds] = useState<Set<string>>(new Set());
 
-  // Select first table by default
   useEffect(() => {
-    if (tables.length > 0 && !selectedId) {
-      setSelectedId(tables[0].id);
-    }
+    if (tables.length > 0 && !selectedId) setSelectedId(tables[0].id);
   }, [tables, selectedId]);
 
   const selectedTable = tables.find((t) => t.id === selectedId);
-  const selectedToken = selectedId ? (tokenMap.get(selectedId) as any)?.token : null;
-
-  const getQrUrl = (token: string) =>
-    `${window.location.origin}/r/${restaurant?.slug}/t/${token}`;
-
-  // Generate QR when selection changes
-  useEffect(() => {
-    if (selectedToken) {
-      const url = getQrUrl(selectedToken);
-      QRCode.toDataURL(url, { width: 500, margin: 2, color: { dark: "#1E3A5F", light: "#FFFFFF" } })
-        .then(setQrDataUrl)
-        .catch(() => setQrDataUrl(""));
-    } else {
-      setQrDataUrl("");
-    }
-  }, [selectedToken, restaurant?.slug]);
+  const selectedTokenRow = selectedId ? (tokenMap.get(selectedId) as any) : null;
 
   /* ── Add table ── */
   const [addOpen, setAddOpen] = useState(false);
@@ -126,9 +104,7 @@ const SuperAdminRestaurantTables = () => {
       qc.invalidateQueries({ queryKey: ["sa-tables", restaurantId] });
       qc.invalidateQueries({ queryKey: ["sa-qr-tokens", restaurantId] });
       setAddOpen(false);
-      setNewNum("");
-      setNewLabel("");
-      setNewCap("4");
+      setNewNum(""); setNewLabel(""); setNewCap("4");
       toast.success("Table added");
     },
     onError: (e: any) => toast.error(e.message),
@@ -150,77 +126,33 @@ const SuperAdminRestaurantTables = () => {
     onError: (e: any) => toast.error(e.message),
   });
 
-  /* ── Regenerate QR ── */
-  const [regenOpen, setRegenOpen] = useState(false);
-  const regenMutation = useMutation({
-    mutationFn: async () => {
-      if (!selectedId) return;
-      const newToken = crypto.randomUUID();
-      const { error } = await supabase
-        .from("table_qr_tokens")
-        .update({ token: newToken, regenerated_at: new Date().toISOString() })
-        .eq("table_id", selectedId);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["sa-qr-tokens", restaurantId] });
-      setRegenOpen(false);
-      toast.success("QR code regenerated");
-    },
-    onError: (e: any) => toast.error(e.message),
-  });
-
-  /* ── Download single QR ── */
-  const downloadQR = () => {
-    if (!qrDataUrl || !selectedTable) return;
-    const a = document.createElement("a");
-    a.href = qrDataUrl;
-    a.download = `${restaurant?.name ?? "restaurant"}-table-${selectedTable.table_number}.png`;
-    a.click();
+  const toggleCheck = (id: string) => {
+    setCheckedIds((prev) => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
   };
 
-  /* ── Copy link ── */
-  const copyLink = () => {
-    if (!selectedToken) return;
-    navigator.clipboard.writeText(getQrUrl(selectedToken));
-    toast.success("Link copied!");
-  };
-
-  /* ── Print QR ── */
-  const printQR = () => {
-    if (!qrDataUrl || !selectedTable) return;
-    const win = window.open("", "_blank");
-    if (!win) return;
-    win.document.write(`
-      <html>
-        <head><title>Table ${selectedTable.table_number} QR</title></head>
-        <body style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;font-family:sans-serif;margin:0;">
-          <img src="${qrDataUrl}" style="width:400px;height:400px;" />
-          <h1 style="margin:16px 0 4px;font-size:32px;">Table ${selectedTable.table_number}</h1>
-          <p style="margin:0;color:#666;font-size:18px;">${restaurant?.name ?? ""}</p>
-        </body>
-      </html>
-    `);
-    win.document.close();
-    win.onload = () => { win.print(); };
-  };
-
-  /* ── Download all QRs as ZIP ── */
   const [zipping, setZipping] = useState(false);
-  const downloadAllQRs = async () => {
+  const downloadCheckedZip = async () => {
     setZipping(true);
     try {
       const zip = new JSZip();
-      for (const tbl of tables) {
-        const token = (tokenMap.get(tbl.id) as any)?.token;
-        if (!token) continue;
-        const url = getQrUrl(token);
-        const dataUrl = await QRCode.toDataURL(url, { width: 500, margin: 2, color: { dark: "#1E3A5F", light: "#FFFFFF" } });
-        const base64 = dataUrl.split(",")[1];
-        zip.file(`${restaurant?.name ?? "restaurant"}-table-${tbl.table_number}.png`, base64, { base64: true });
+      for (const id of checkedIds) {
+        const tbl = tables.find((t) => t.id === id);
+        const tokenRow = tokenMap.get(id) as any;
+        if (!tbl || !tokenRow?.token) continue;
+        const settings = tokenRow.qr_settings || {};
+        const url = `${window.location.origin}/r/${restaurant?.slug}/t/${tokenRow.token}`;
+        const dataUrl = await QRCode.toDataURL(url, {
+          width: 1000, margin: 2,
+          color: { dark: settings.dot_color || "#0F172A", light: settings.bg_color || "#FFFFFF" },
+        });
+        zip.file(`table-${tbl.table_number}.png`, dataUrl.split(",")[1], { base64: true });
       }
       const blob = await zip.generateAsync({ type: "blob" });
-      saveAs(blob, `${restaurant?.name ?? "restaurant"}-qr-codes.zip`);
+      saveAs(blob, `optiflow-qr-codes-${restaurant?.name ?? "restaurant"}.zip`);
       toast.success("QR codes downloaded");
     } catch {
       toast.error("Failed to create ZIP");
@@ -230,7 +162,7 @@ const SuperAdminRestaurantTables = () => {
   };
 
   return (
-    <div className="flex h-[calc(100vh-theme(spacing.14)-theme(spacing.12))] flex-col md:h-[calc(100vh-theme(spacing.12))]">
+    <div className="flex h-[calc(100vh-7rem)] flex-col">
       {/* Header */}
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
@@ -240,114 +172,98 @@ const SuperAdminRestaurantTables = () => {
           >
             <ArrowLeft className="h-4 w-4" />
           </button>
-           <h1 className="text-h2 text-foreground">
-            Tables — {restaurant?.name}
-          </h1>
+          <h1 className="text-h2 text-foreground">Tables — {restaurant?.name}</h1>
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={downloadAllQRs} disabled={zipping || tables.length === 0}>
-            <PackageOpen className="mr-1.5 h-3.5 w-3.5" /> {zipping ? "Zipping…" : "Download All QRs"}
-          </Button>
-          <Button size="sm" onClick={() => setAddOpen(true)}>
-            <Plus className="mr-1.5 h-3.5 w-3.5" /> Add Table
-          </Button>
-        </div>
+        <Button size="sm" onClick={() => setAddOpen(true)}>
+          <Plus className="mr-1.5 h-3.5 w-3.5" /> Add Table
+        </Button>
       </div>
 
-      {/* Split panel */}
+      {/* Two-panel layout */}
       <div className="flex flex-1 gap-4 overflow-hidden">
-        {/* Left — table list */}
-        <Card className="w-64 shrink-0 overflow-auto">
-          <CardContent className="p-0">
+        {/* LEFT — Table list */}
+        <Card className="w-[300px] shrink-0 flex flex-col overflow-hidden">
+          <div className="flex-1 overflow-auto">
             {tables.map((tbl) => {
               const hasOpenBill = billTableIds.has(tbl.id);
+              const isSelected = selectedId === tbl.id;
               return (
                 <button
                   key={tbl.id}
                   onClick={() => setSelectedId(tbl.id)}
                   className={cn(
-                    "flex w-full items-center justify-between border-b border-border px-4 py-3 text-left transition-colors last:border-b-0",
-                    selectedId === tbl.id ? "bg-primary/10" : "hover:bg-muted/50"
+                    "flex w-full items-center gap-3 border-b border-border px-4 py-3 text-left transition-all last:border-b-0",
+                    isSelected ? "bg-primary/5 border-l-[3px] border-l-primary" : "hover:bg-muted/50"
                   )}
                 >
-                  <div>
-                    <p className={cn("text-sm font-semibold", selectedId === tbl.id ? "text-primary" : "text-foreground")}>
-                      Table {tbl.table_number}
-                    </p>
-                    {tbl.label && <p className="text-xs text-muted-foreground">{tbl.label}</p>}
+                  <Checkbox
+                    checked={checkedIds.has(tbl.id)}
+                    onCheckedChange={() => toggleCheck(tbl.id)}
+                    onClick={(e) => e.stopPropagation()}
+                    className="shrink-0"
+                  />
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span className="text-2xl text-foreground" style={{ fontWeight: 800 }}>{tbl.table_number}</span>
+                      <Badge variant={hasOpenBill ? "default" : "secondary"} className="text-[10px]">
+                        {hasOpenBill ? "Open Bill" : "Empty"}
+                      </Badge>
+                    </div>
+                    {tbl.label && <p className="text-xs text-muted-foreground truncate">{tbl.label}</p>}
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Badge variant={hasOpenBill ? "default" : "secondary"} className="text-[10px]">
-                      {hasOpenBill ? "Open" : "Empty"}
-                    </Badge>
-                    <button
-                      onClick={(e) => { e.stopPropagation(); setDeleteId(tbl.id); }}
-                      className="text-muted-foreground hover:text-destructive"
-                    >
-                      <Trash2 className="h-3.5 w-3.5" />
-                    </button>
-                  </div>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); setDeleteId(tbl.id); }}
+                    className="text-muted-foreground hover:text-destructive shrink-0"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </button>
                 </button>
               );
             })}
             {tables.length === 0 && (
-              <p className="px-4 py-8 text-center text-sm text-muted-foreground">No tables yet.</p>
+              <p className="px-4 py-12 text-center text-sm text-muted-foreground">No tables yet.</p>
             )}
-          </CardContent>
+          </div>
         </Card>
 
-        {/* Right — QR display */}
-        <Card className="flex flex-1 items-center justify-center overflow-auto">
-          {selectedTable && selectedToken ? (
-            <CardContent className="flex flex-col items-center gap-4 py-8">
-              {qrDataUrl && (
-                <div className="rounded-2xl border border-border bg-white p-4 shadow-sm">
-                  <img src={qrDataUrl} alt="QR Code" className="h-[300px] w-[300px]" />
-                </div>
-              )}
-
-              <div className="text-center">
-                <p className="text-2xl font-bold text-foreground">Table {selectedTable.table_number}</p>
-                {selectedTable.label && <p className="text-sm text-muted-foreground">{selectedTable.label}</p>}
-                <p className="mt-1 text-sm text-muted-foreground">{restaurant?.name}</p>
-              </div>
-
-              <div className="rounded-lg bg-muted px-4 py-2">
-                <p className="max-w-[400px] break-all text-center text-xs font-mono text-muted-foreground">
-                  {getQrUrl(selectedToken)}
-                </p>
-              </div>
-
-              <div className="flex flex-wrap items-center justify-center gap-2">
-                <Button onClick={downloadQR}>
-                  <Download className="mr-1.5 h-4 w-4" /> Download PNG
-                </Button>
-                <Button variant="outline" onClick={copyLink}>
-                  <Copy className="mr-1.5 h-4 w-4" /> Copy Link
-                </Button>
-                <Button variant="outline" onClick={printQR}>
-                  <Printer className="mr-1.5 h-4 w-4" /> Print QR
-                </Button>
-                <Button variant="outline" className="text-amber-600" onClick={() => setRegenOpen(true)}>
-                  <RefreshCw className="mr-1.5 h-4 w-4" /> Regenerate QR
-                </Button>
-              </div>
-
-              <p className="mt-2 text-[11px] text-muted-foreground">
-                Token: <span className="font-mono">{selectedToken}</span>
-              </p>
-            </CardContent>
+        {/* RIGHT — QR Studio */}
+        <Card className="flex-1 overflow-auto">
+          {selectedTable && selectedTokenRow?.token ? (
+            <QrStudio
+              tableId={selectedTable.id}
+              tableNumber={selectedTable.table_number}
+              tableLabel={selectedTable.label}
+              token={selectedTokenRow.token}
+              restaurantSlug={restaurant?.slug ?? ""}
+              restaurantName={restaurant?.name ?? ""}
+              restaurantLogoUrl={theme?.logo_url}
+              savedSettings={selectedTokenRow.qr_settings}
+              qrTokenQueryKey={["sa-qr-tokens", restaurantId!]}
+            />
           ) : (
-            <CardContent className="py-20 text-center">
-              <p className="text-muted-foreground">Select a table to view its QR code</p>
+            <CardContent className="flex items-center justify-center h-full">
+              <p className="text-muted-foreground">Select a table to customize its QR code</p>
             </CardContent>
           )}
         </Card>
       </div>
 
-      {/* ── Dialogs ── */}
+      {/* Bulk action bar */}
+      {checkedIds.size >= 2 && (
+        <div className="mt-3 flex items-center justify-between rounded-xl bg-secondary px-5 py-3 text-secondary-foreground animate-fade-in">
+          <span className="text-sm font-semibold">{checkedIds.size} tables selected</span>
+          <div className="flex gap-2">
+            <Button size="sm" variant="outline" className="border-white/20 text-white hover:bg-white/10" onClick={downloadCheckedZip} disabled={zipping}>
+              <PackageOpen className="mr-1.5 h-3.5 w-3.5" />{zipping ? "Zipping…" : "Download All as ZIP"}
+            </Button>
+            <Button size="sm" variant="ghost" className="text-white/70 hover:text-white" onClick={() => setCheckedIds(new Set())}>
+              Clear
+            </Button>
+          </div>
+        </div>
+      )}
 
-      {/* Add table */}
+      {/* Dialogs */}
       <Dialog open={addOpen} onOpenChange={setAddOpen}>
         <DialogContent>
           <DialogHeader><DialogTitle>Add Table</DialogTitle></DialogHeader>
@@ -362,7 +278,6 @@ const SuperAdminRestaurantTables = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Delete table */}
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -374,22 +289,6 @@ const SuperAdminRestaurantTables = () => {
             <AlertDialogAction className="bg-destructive hover:bg-destructive/90" onClick={() => deleteId && deleteMutation.mutate(deleteId)}>
               Delete
             </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
-      {/* Regenerate QR */}
-      <AlertDialog open={regenOpen} onOpenChange={setRegenOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Regenerate QR Code</AlertDialogTitle>
-            <AlertDialogDescription>
-              This will invalidate the current QR code. Old printed QR codes will stop working. Continue?
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={() => regenMutation.mutate()}>Regenerate</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
