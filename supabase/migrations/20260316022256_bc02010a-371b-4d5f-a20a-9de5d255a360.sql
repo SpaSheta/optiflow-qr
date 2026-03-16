@@ -1,0 +1,1 @@
+ALTER TABLE public.table_qr_tokens ADD COLUMN IF NOT EXISTS qr_settings jsonb DEFAULT '{}'::jsonb;
