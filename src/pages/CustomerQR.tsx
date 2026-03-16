@@ -291,8 +291,8 @@ const CustomerQR = () => {
             className="flex items-center gap-1.5 rounded-full px-5 py-2 text-sm font-medium transition-all"
             style={
               activeTab === t.key
-                ? { backgroundColor: primaryColor, color: "#fff" }
-                : { backgroundColor: `${secondaryColor}12`, color: secondaryColor }
+                ? { backgroundColor: tabActiveColor, color: "#fff" }
+                : { backgroundColor: `${headerBg}12`, color: bodyTextColor }
             }
           >
             {t.icon} {t.label}
