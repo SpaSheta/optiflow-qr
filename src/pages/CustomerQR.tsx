@@ -55,9 +55,20 @@ const CustomerQR = () => {
   useEffect(() => {
     if (!theme) return;
     const root = document.documentElement;
-    if (theme.primary_color) root.style.setProperty("--qr-primary", theme.primary_color);
-    if (theme.secondary_color) root.style.setProperty("--qr-secondary", theme.secondary_color);
-    if (theme.background_color) root.style.setProperty("--qr-bg", theme.background_color);
+    const props: Record<string, string> = {
+      "--page-bg": theme.background_color || "#F5F5F0",
+      "--header-bg": theme.header_bg_color || theme.secondary_color || "#1E3A5F",
+      "--header-text": theme.header_text_color || "#FFFFFF",
+      "--tab-active": theme.tab_active_color || theme.primary_color || "#0FBCB0",
+      "--card-bg": theme.card_bg_color || "#FFFFFF",
+      "--body-text": theme.body_text_color || "#1F2937",
+      "--price-color": theme.price_color || theme.primary_color || "#0FBCB0",
+      "--accent": theme.primary_color || "#0FBCB0",
+      "--qr-primary": theme.primary_color || "#F5A623",
+      "--qr-secondary": theme.secondary_color || "#1E3A5F",
+      "--qr-bg": theme.background_color || "#F5F5F0",
+    };
+    Object.entries(props).forEach(([k, v]) => root.style.setProperty(k, v));
 
     // Load Google Font
     if (theme.font_family) {
@@ -71,9 +82,7 @@ const CustomerQR = () => {
     }
 
     return () => {
-      root.style.removeProperty("--qr-primary");
-      root.style.removeProperty("--qr-secondary");
-      root.style.removeProperty("--qr-bg");
+      Object.keys(props).forEach((k) => root.style.removeProperty(k));
       const el = document.getElementById("qr-google-font");
       if (el) el.remove();
     };
@@ -292,7 +301,7 @@ const CustomerQR = () => {
             style={
               activeTab === t.key
                 ? { backgroundColor: tabActiveColor, color: "#fff" }
-                : { backgroundColor: `${headerBg}12`, color: bodyTextColor }
+                : { backgroundColor: "rgba(0,0,0,0.06)", color: bodyTextColor }
             }
           >
             {t.icon} {t.label}
@@ -327,14 +336,14 @@ const CustomerQR = () => {
 
                 <div className="space-y-2">
                   {billItems.map((item) => (
-                    <div key={item.id} className="flex items-center justify-between rounded-xl p-4 shadow-sm ring-1 ring-border" style={{ backgroundColor: cardBgColor }}>
-                      <div>
-                        <p className="text-sm font-medium" style={{ color: bodyTextColor }}>{item.name}</p>
-                        <p className="text-xs" style={{ color: bodyTextColor, opacity: 0.5 }}>× {item.quantity}</p>
+                    <div key={item.id} className="flex items-center justify-between rounded-xl p-3" style={{ backgroundColor: cardBgColor }}>
+                      <div className="flex items-center gap-2 min-w-0">
+                        <span className="text-sm font-semibold truncate" style={{ color: bodyTextColor }}>{item.name}</span>
+                        <span className="text-xs shrink-0" style={{ color: bodyTextColor, opacity: 0.45 }}>×{item.quantity}</span>
                       </div>
-                      <p className="text-sm font-semibold" style={{ color: priceTextColor }}>
+                      <span className="text-sm font-bold shrink-0 ml-3" style={{ color: priceTextColor }}>
                         {formatPrice(item.total_price)}
-                      </p>
+                      </span>
                     </div>
                   ))}
                 </div>
@@ -428,46 +437,66 @@ const CustomerQR = () => {
         {/* ====== CONTACT TAB ====== */}
         {activeTab === "contact" && (
           <section className="space-y-4">
-            {restaurant?.address && (
-              <a
-                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(restaurant.address)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-start gap-3 rounded-xl p-4 shadow-sm ring-1 ring-border" style={{ backgroundColor: cardBgColor }}
-              >
-                <MapPin className="mt-0.5 h-5 w-5 shrink-0" style={{ color: accentColor }} />
-                <span className="text-sm" style={{ color: bodyTextColor }}>{restaurant.address}</span>
-              </a>
-            )}
-            {restaurant?.phone && (
-              <a
-                href={`tel:${restaurant.phone}`}
-                className="flex items-center gap-3 rounded-xl p-4 shadow-sm ring-1 ring-border" style={{ backgroundColor: cardBgColor }}
-              >
-                <Phone className="h-5 w-5 shrink-0" style={{ color: accentColor }} />
-                <span className="text-sm" style={{ color: bodyTextColor }}>{restaurant.phone}</span>
-              </a>
-            )}
-            <div className="flex justify-center gap-4 pt-2">
-              {restaurant?.instagram && (
-                <a href={`https://instagram.com/${restaurant.instagram}`} target="_blank" rel="noopener noreferrer"
-                  className="flex h-12 w-12 items-center justify-center rounded-full" style={{ backgroundColor: `${accentColor}20` }}>
-                  <Instagram className="h-5 w-5" style={{ color: accentColor }} />
-                </a>
-              )}
-              {restaurant?.facebook && (
-                <a href={restaurant.facebook} target="_blank" rel="noopener noreferrer"
-                  className="flex h-12 w-12 items-center justify-center rounded-full" style={{ backgroundColor: `${accentColor}20` }}>
-                  <Facebook className="h-5 w-5" style={{ color: accentColor }} />
-                </a>
-              )}
-              {restaurant?.website && (
-                <a href={restaurant.website} target="_blank" rel="noopener noreferrer"
-                  className="flex h-12 w-12 items-center justify-center rounded-full" style={{ backgroundColor: `${accentColor}20` }}>
-                  <Globe className="h-5 w-5" style={{ color: accentColor }} />
-                </a>
-              )}
-            </div>
+            {(() => {
+              const hasAddress = !!restaurant?.address?.trim();
+              const hasPhone = !!restaurant?.phone?.trim();
+              const hasInsta = !!restaurant?.instagram?.trim();
+              const hasFb = !!restaurant?.facebook?.trim();
+              const hasWeb = !!restaurant?.website?.trim();
+              const hasAny = hasAddress || hasPhone || hasInsta || hasFb || hasWeb;
+
+              if (!hasAny) {
+                return (
+                  <div className="flex flex-col items-center gap-3 rounded-xl p-8 text-center" style={{ backgroundColor: cardBgColor }}>
+                    <Phone className="h-10 w-10" style={{ color: bodyTextColor, opacity: 0.3 }} />
+                    <p className="text-sm" style={{ color: bodyTextColor, opacity: 0.5 }}>Contact info not available</p>
+                  </div>
+                );
+              }
+
+              return (
+                <>
+                  {hasAddress && (
+                    <a
+                      href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(restaurant!.address!)}`}
+                      target="_blank" rel="noopener noreferrer"
+                      className="flex items-start gap-3 rounded-xl p-4" style={{ backgroundColor: cardBgColor }}
+                    >
+                      <MapPin className="mt-0.5 h-5 w-5 shrink-0" style={{ color: accentColor }} />
+                      <span className="text-sm" style={{ color: bodyTextColor }}>{restaurant!.address}</span>
+                    </a>
+                  )}
+                  {hasPhone && (
+                    <a href={`tel:${restaurant!.phone}`} className="flex items-center gap-3 rounded-xl p-4" style={{ backgroundColor: cardBgColor }}>
+                      <Phone className="h-5 w-5 shrink-0" style={{ color: accentColor }} />
+                      <span className="text-sm" style={{ color: bodyTextColor }}>{restaurant!.phone}</span>
+                    </a>
+                  )}
+                  {(hasInsta || hasFb || hasWeb) && (
+                    <div className="flex justify-center gap-4 pt-2">
+                      {hasInsta && (
+                        <a href={`https://instagram.com/${restaurant!.instagram}`} target="_blank" rel="noopener noreferrer"
+                          className="flex h-12 w-12 items-center justify-center rounded-full" style={{ backgroundColor: `${accentColor}20` }}>
+                          <Instagram className="h-5 w-5" style={{ color: accentColor }} />
+                        </a>
+                      )}
+                      {hasFb && (
+                        <a href={restaurant!.facebook!} target="_blank" rel="noopener noreferrer"
+                          className="flex h-12 w-12 items-center justify-center rounded-full" style={{ backgroundColor: `${accentColor}20` }}>
+                          <Facebook className="h-5 w-5" style={{ color: accentColor }} />
+                        </a>
+                      )}
+                      {hasWeb && (
+                        <a href={restaurant!.website!} target="_blank" rel="noopener noreferrer"
+                          className="flex h-12 w-12 items-center justify-center rounded-full" style={{ backgroundColor: `${accentColor}20` }}>
+                          <Globe className="h-5 w-5" style={{ color: accentColor }} />
+                        </a>
+                      )}
+                    </div>
+                  )}
+                </>
+              );
+            })()}
           </section>
         )}
       </main>
@@ -517,7 +546,7 @@ const CustomerQR = () => {
                 size="sm"
                 disabled={waiterSending || !waiterMessage.trim()}
                 onClick={() => sendWaiterRequest("other", waiterMessage)}
-                style={{ backgroundColor: primaryColor }}
+                style={{ backgroundColor: accentColor }}
                 className="text-white"
               >
                 {waiterSending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Send"}
