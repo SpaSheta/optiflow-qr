@@ -209,6 +209,13 @@ const CustomerQR = () => {
   const bgColor = theme?.background_color || "#F5F5F0";
   const secondaryColor = theme?.secondary_color || "#1E3A5F";
   const fontFamily = theme?.font_family || "Inter";
+  const headerBg = theme?.header_bg_color || secondaryColor;
+  const headerTextColor = theme?.header_text_color || "#FFFFFF";
+  const tabActiveColor = theme?.tab_active_color || primaryColor;
+  const cardBgColor = theme?.card_bg_color || "#FFFFFF";
+  const bodyTextColor = theme?.body_text_color || "#1F2937";
+  const priceTextColor = theme?.price_color || primaryColor;
+  const accentColor = primaryColor;
 
   const menuByCategory = useMemo(() => {
     const map: Record<string, MenuItem[]> = {};
