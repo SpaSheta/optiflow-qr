@@ -110,7 +110,7 @@ const DashboardTheme = () => {
 
   return (
     <div>
-      <h1 className="mb-6 text-2xl font-bold text-foreground" style={{ fontFamily: "var(--restaurant-name)" }}>
+      <h1 className="text-h1 text-foreground mb-8">
         Theme
       </h1>
 

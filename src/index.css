@@ -2,95 +2,105 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* OptiFlow Design System — All colors in HSL */
 
 @layer base {
   :root {
-    --background: 200 10% 96%;
-    --foreground: 180 8% 12%;
+    /* Core palette */
+    --background: 210 40% 98%;
+    --foreground: 222 47% 11%;
 
     --card: 0 0% 100%;
-    --card-foreground: 180 8% 12%;
+    --card-foreground: 222 47% 11%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 180 8% 12%;
+    --popover-foreground: 222 47% 11%;
 
-    --primary: 174 72% 48%;
-    --primary-foreground: 180 20% 8%;
+    --primary: 174 85% 40%;
+    --primary-foreground: 0 0% 100%;
+    --primary-dark: 174 85% 32%;
+    --primary-light: 174 60% 95%;
 
-    --secondary: 174 20% 92%;
-    --secondary-foreground: 180 10% 20%;
+    --secondary: 215 50% 17%;
+    --secondary-foreground: 210 40% 98%;
 
-    --muted: 180 8% 93%;
-    --muted-foreground: 180 6% 48%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 16% 57%;
 
-    --accent: 174 72% 48%;
-    --accent-foreground: 180 20% 8%;
+    --accent: 174 85% 40%;
+    --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 180 12% 88%;
-    --input: 180 12% 88%;
-    --ring: 174 72% 48%;
+    --success: 160 84% 39%;
+    --warning: 38 92% 50%;
+    --error: 0 84% 60%;
+
+    --text-primary: 222 47% 11%;
+    --text-secondary: 215 16% 47%;
+    --text-muted: 215 16% 65%;
+
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 174 85% 40%;
 
     --radius: 0.75rem;
 
     --restaurant-name: 'Playfair Display', serif;
     --body-font: 'DM Sans', sans-serif;
 
-    --sidebar-background: 180 12% 8%;
-    --sidebar-foreground: 174 40% 85%;
-    --sidebar-primary: 174 72% 55%;
-    --sidebar-primary-foreground: 180 20% 8%;
-    --sidebar-accent: 180 15% 14%;
-    --sidebar-accent-foreground: 174 40% 85%;
-    --sidebar-border: 180 12% 16%;
-    --sidebar-ring: 174 72% 48%;
+    /* Sidebar */
+    --sidebar-background: 222 47% 11%;
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-primary: 174 85% 45%;
+    --sidebar-primary-foreground: 222 47% 11%;
+    --sidebar-accent: 217 33% 17%;
+    --sidebar-accent-foreground: 210 40% 98%;
+    --sidebar-border: 217 33% 20%;
+    --sidebar-ring: 174 85% 40%;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
+    --background: 222 84% 5%;
     --foreground: 210 40% 98%;
 
-    --card: 222.2 84% 4.9%;
+    --card: 222 84% 5%;
     --card-foreground: 210 40% 98%;
 
-    --popover: 222.2 84% 4.9%;
+    --popover: 222 84% 5%;
     --popover-foreground: 210 40% 98%;
 
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    --primary: 174 85% 45%;
+    --primary-foreground: 222 47% 11%;
 
-    --secondary: 217.2 32.6% 17.5%;
+    --secondary: 217 33% 18%;
     --secondary-foreground: 210 40% 98%;
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted: 217 33% 18%;
+    --muted-foreground: 215 20% 65%;
 
-    --accent: 217.2 32.6% 17.5%;
+    --accent: 217 33% 18%;
     --accent-foreground: 210 40% 98%;
 
-    --destructive: 0 62.8% 30.6%;
+    --destructive: 0 63% 31%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
+    --border: 217 33% 18%;
+    --input: 217 33% 18%;
+    --ring: 213 27% 84%;
+    --sidebar-background: 240 6% 10%;
+    --sidebar-foreground: 240 5% 96%;
+    --sidebar-primary: 224 76% 48%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-accent: 240 4% 16%;
+    --sidebar-accent-foreground: 240 5% 96%;
+    --sidebar-border: 240 4% 16%;
+    --sidebar-ring: 217 91% 60%;
   }
 }
 
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&family=Cairo:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;800&family=DM+Sans:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700&family=Cairo:wght@400;500;600;700&display=swap');
 
 @layer base {
   * {
@@ -100,5 +110,94 @@ All colors MUST be HSL.
   body {
     @apply bg-background text-foreground;
     font-family: var(--body-font);
+  }
+
+  /* ── Typography System ── */
+  .text-display {
+    @apply text-5xl tracking-tight leading-none;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+  }
+
+  .text-h1 {
+    @apply text-3xl tracking-tight;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  .text-h2 {
+    @apply text-2xl;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+
+  .text-h3 {
+    @apply text-lg;
+    font-weight: 700;
+  }
+
+  .text-body-lg {
+    @apply text-base leading-relaxed;
+    font-weight: 400;
+    color: hsl(var(--text-secondary));
+  }
+
+  .text-body-sm {
+    @apply text-sm;
+    font-weight: 400;
+    color: hsl(var(--text-secondary));
+  }
+
+  .text-label {
+    @apply text-xs font-medium uppercase;
+    letter-spacing: 0.08em;
+    color: hsl(var(--text-muted));
+  }
+
+  .text-stat {
+    @apply text-4xl;
+    font-weight: 800;
+  }
+}
+
+/* ── Card refinements ── */
+@layer components {
+  .card-optiflow {
+    @apply bg-card rounded-2xl border border-border p-6;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  }
+
+  .stat-card {
+    @apply card-optiflow relative overflow-hidden transition-all duration-200;
+  }
+  .stat-card:hover {
+    border-left: 4px solid hsl(var(--primary));
+  }
+
+  /* Status badges */
+  .badge-open {
+    @apply inline-flex items-center rounded-full px-2.5 py-1 text-xs;
+    background: #ECFDF5;
+    color: #059669;
+    font-weight: 600;
+  }
+  .badge-paid {
+    @apply inline-flex items-center rounded-full px-2.5 py-1 text-xs;
+    background: #EFF6FF;
+    color: #2563EB;
+    font-weight: 600;
+  }
+  .badge-pending {
+    @apply inline-flex items-center rounded-full px-2.5 py-1 text-xs;
+    background: #FFFBEB;
+    color: #D97706;
+    font-weight: 600;
+  }
+  .badge-suspended {
+    @apply inline-flex items-center rounded-full px-2.5 py-1 text-xs;
+    background: #FEF2F2;
+    color: #DC2626;
+    font-weight: 600;
   }
 }

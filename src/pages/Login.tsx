@@ -10,7 +10,6 @@ const Login = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isSignUp, setIsSignUp] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -18,27 +17,17 @@ const Login = () => {
     setLoading(true);
 
     try {
-      if (isSignUp) {
-        const { error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: { emailRedirectTo: window.location.origin },
-        });
-        if (error) throw error;
-        toast.success("Check your email to confirm your account!");
-      } else {
-        const { error, data: signInData } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
+      const { error, data: signInData } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) throw error;
 
-        // Check if super admin
-        const { data: saData } = await supabase
-          .from("super_admins")
-          .select("id")
-          .eq("user_id", signInData.user.id)
-          .maybeSingle();
+      // Check if super admin
+      const { data: saData } = await supabase
+        .from("super_admins")
+        .select("id")
+        .eq("user_id", signInData.user.id)
+        .maybeSingle();
 
-        navigate(saData ? "/super-admin" : "/dashboard");
-      }
+      navigate(saData ? "/super-admin" : "/dashboard");
     } catch (err: any) {
       toast.error(err.message);
     } finally {
@@ -48,19 +37,19 @@ const Login = () => {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-5">
-      <div className="w-full max-w-sm space-y-6">
-        <div className="text-center">
-          <h1 className="text-3xl font-bold text-foreground" style={{ fontFamily: "var(--restaurant-name)" }}>
+      <div className="w-full max-w-[400px] rounded-3xl bg-card p-10 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)] border border-border">
+        <div className="text-center mb-8">
+          <h1 className="text-[32px] font-extrabold text-secondary">
             OptiFlow
           </h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {isSignUp ? "Create your account" : "Sign in to your dashboard"}
+          <p className="mt-2 text-sm text-muted-foreground">
+            Sign in to your dashboard
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email" className="mb-1.5 block">Email</Label>
             <Input
               id="email"
               type="email"
@@ -71,7 +60,7 @@ const Login = () => {
             />
           </div>
           <div>
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password" className="mb-1.5 block">Password</Label>
             <Input
               id="password"
               type="password"
@@ -82,19 +71,13 @@ const Login = () => {
               minLength={6}
             />
           </div>
-          <Button variant="cta" size="xl" className="w-full" type="submit" disabled={loading}>
-            {loading ? "Loading…" : isSignUp ? "Sign Up" : "Sign In"}
+          <Button variant="cta" size="xl" className="w-full text-base" type="submit" disabled={loading}>
+            {loading ? "Signing in…" : "Sign In"}
           </Button>
         </form>
 
-        <p className="text-center text-sm text-muted-foreground">
-          {isSignUp ? "Already have an account?" : "Don't have an account?"}{" "}
-          <button
-            onClick={() => setIsSignUp(!isSignUp)}
-            className="font-medium text-primary hover:underline"
-          >
-            {isSignUp ? "Sign In" : "Sign Up"}
-          </button>
+        <p className="mt-6 text-center text-[13px] text-muted-foreground">
+          Access is by invitation only.
         </p>
       </div>
     </div>

@@ -129,7 +129,7 @@ const SuperAdminRestaurantNew = () => {
         <ArrowLeft className="h-4 w-4" /> Back to Restaurants
       </button>
 
-      <h1 className="mb-2 text-2xl font-bold text-foreground" style={{ fontFamily: "var(--restaurant-name)" }}>
+      <h1 className="text-h1 text-foreground mb-2">
         Create New Restaurant
       </h1>
       <p className="mb-6 text-sm text-muted-foreground">

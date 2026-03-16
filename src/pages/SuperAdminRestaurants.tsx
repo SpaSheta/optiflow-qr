@@ -97,28 +97,28 @@ const SuperAdminRestaurants = () => {
   const planBadge = (plan: string | null) => {
     const p = plan ?? "starter";
     const colors: Record<string, string> = {
-      starter: "bg-muted text-muted-foreground hover:bg-muted",
-      pro: "bg-blue-100 text-blue-700 hover:bg-blue-100",
-      enterprise: "bg-violet-100 text-violet-700 hover:bg-violet-100",
+      starter: "bg-muted text-muted-foreground",
+      pro: "badge-paid",
+      enterprise: "bg-violet-50 text-violet-700",
     };
-    return <Badge className={colors[p] ?? colors.starter}>{p.charAt(0).toUpperCase() + p.slice(1)}</Badge>;
+    return <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold ${colors[p] ?? colors.starter}`}>{p.charAt(0).toUpperCase() + p.slice(1)}</span>;
   };
 
   const statusBadge = (status: string | null) => {
     const s = status ?? "active";
     const colors: Record<string, string> = {
-      active: "bg-emerald-100 text-emerald-700 hover:bg-emerald-100",
-      suspended: "bg-red-100 text-red-700 hover:bg-red-100",
-      pending: "bg-amber-100 text-amber-700 hover:bg-amber-100",
-      inactive: "bg-muted text-muted-foreground hover:bg-muted",
+      active: "badge-open",
+      suspended: "badge-suspended",
+      pending: "badge-pending",
+      inactive: "bg-muted text-muted-foreground",
     };
-    return <Badge className={colors[s] ?? colors.active}>{s.charAt(0).toUpperCase() + s.slice(1)}</Badge>;
+    return <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold ${colors[s] ?? colors.active}`}>{s.charAt(0).toUpperCase() + s.slice(1)}</span>;
   };
 
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-foreground" style={{ fontFamily: "var(--restaurant-name)" }}>
+        <h1 className="text-h1 text-foreground">
           Restaurants
         </h1>
         <Button onClick={() => navigate("/super-admin/restaurants/new")}>

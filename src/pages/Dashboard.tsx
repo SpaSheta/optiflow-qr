@@ -52,13 +52,13 @@ const Dashboard = () => {
   };
 
   const statusBadge = (status: string) => {
-    const map: Record<string, { label: string; variant: "default" | "secondary" | "destructive" }> = {
-      empty: { label: "Empty", variant: "secondary" },
-      open: { label: "Open Bill", variant: "default" },
-      attention: { label: "Needs Attention", variant: "destructive" },
+    const map: Record<string, { label: string; className: string }> = {
+      empty: { label: "Empty", className: "badge-paid" },
+      open: { label: "Open Bill", className: "badge-open" },
+      attention: { label: "Needs Attention", className: "badge-suspended" },
     };
     const s = map[status] ?? map.empty;
-    return <Badge variant={s.variant}>{s.label}</Badge>;
+    return <span className={s.className}>{s.label}</span>;
   };
 
   const stats = [
@@ -70,19 +70,19 @@ const Dashboard = () => {
 
   return (
     <div>
-      <h1 className="mb-6 text-2xl font-bold text-foreground" style={{ fontFamily: "var(--restaurant-name)" }}>
+      <h1 className="text-h1 text-foreground mb-8">
         Overview
       </h1>
 
-      <div className="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
+      <div className="mb-8 grid grid-cols-2 gap-4 lg:grid-cols-4">
         {stats.map((s) => (
-          <Card key={s.label}>
-            <CardContent className="flex flex-col gap-2 p-5">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                <s.icon className="h-4 w-4" />
+          <Card key={s.label} className="stat-card">
+            <CardContent className="flex flex-col gap-3 p-6">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                <s.icon className="h-5 w-5" />
               </div>
-              <p className="text-xs text-muted-foreground">{s.label}</p>
-              <p className="text-xl font-bold text-foreground">{s.value}</p>
+              <p className="text-label">{s.label}</p>
+              <p className="text-stat text-secondary">{s.value}</p>
             </CardContent>
           </Card>
         ))}
@@ -102,7 +102,7 @@ const Dashboard = () => {
               const status = getStatus(t.id);
               return (
                 <TableRow key={t.id}>
-                  <TableCell className="font-medium">{t.table_number}</TableCell>
+                  <TableCell className="font-bold">{t.table_number}</TableCell>
                   <TableCell>{statusBadge(status)}</TableCell>
                   <TableCell className="text-right">
                     {status !== "empty" && (
