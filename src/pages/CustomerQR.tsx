@@ -336,14 +336,14 @@ const CustomerQR = () => {
 
                 <div className="space-y-2">
                   {billItems.map((item) => (
-                    <div key={item.id} className="flex items-center justify-between rounded-xl p-4 shadow-sm ring-1 ring-border" style={{ backgroundColor: cardBgColor }}>
-                      <div>
-                        <p className="text-sm font-medium" style={{ color: bodyTextColor }}>{item.name}</p>
-                        <p className="text-xs" style={{ color: bodyTextColor, opacity: 0.5 }}>× {item.quantity}</p>
+                    <div key={item.id} className="flex items-center justify-between rounded-xl p-3" style={{ backgroundColor: cardBgColor }}>
+                      <div className="flex items-center gap-2 min-w-0">
+                        <span className="text-sm font-semibold truncate" style={{ color: bodyTextColor }}>{item.name}</span>
+                        <span className="text-xs shrink-0" style={{ color: bodyTextColor, opacity: 0.45 }}>×{item.quantity}</span>
                       </div>
-                      <p className="text-sm font-semibold" style={{ color: priceTextColor }}>
+                      <span className="text-sm font-bold shrink-0 ml-3" style={{ color: priceTextColor }}>
                         {formatPrice(item.total_price)}
-                      </p>
+                      </span>
                     </div>
                   ))}
                 </div>
