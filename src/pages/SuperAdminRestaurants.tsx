@@ -118,7 +118,7 @@ const SuperAdminRestaurants = () => {
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-foreground" style={{ fontFamily: "var(--restaurant-name)" }}>
+        <h1 className="text-h1 text-foreground">
           Restaurants
         </h1>
         <Button onClick={() => navigate("/super-admin/restaurants/new")}>
