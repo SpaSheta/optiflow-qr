@@ -25,6 +25,27 @@ const SuperAdminLayout = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [pendingCount, setPendingCount] = useState(0);
+
+  useEffect(() => {
+    const fetchPending = async () => {
+      const { count } = await supabase
+        .from("signup_requests")
+        .select("id", { count: "exact", head: true })
+        .eq("status", "pending");
+      setPendingCount(count || 0);
+    };
+    fetchPending();
+
+    const channel = supabase
+      .channel("sidebar-signups")
+      .on("postgres_changes", { event: "*", schema: "public", table: "signup_requests" }, () => {
+        fetchPending();
+      })
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
+  }, []);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
