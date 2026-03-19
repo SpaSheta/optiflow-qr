@@ -437,7 +437,7 @@ const LandingPage = () => {
             </p>
           </FadeUp>
           <FadeUp delay={0.2}>
-            <button onClick={() => navigate("/login")} className="px-10 py-4 rounded-xl bg-[#0FBCB0] text-white text-lg font-semibold hover:bg-[#0A9A90] hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg shadow-[#0FBCB0]/25 mb-6">
+            <button onClick={() => navigate("/signup")} className="px-10 py-4 rounded-xl bg-[#0FBCB0] text-white text-lg font-semibold hover:bg-[#0A9A90] hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg shadow-[#0FBCB0]/25 mb-6">
               Get Started Today
             </button>
             <p className="text-sm text-white/40 flex items-center justify-center gap-2">
