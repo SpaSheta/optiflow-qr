@@ -121,7 +121,7 @@ const LandingPage = () => {
 
           <FadeUp delay={0.3}>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-10">
-              <button onClick={() => scrollTo("cta")} className="px-8 py-4 rounded-xl bg-[#0FBCB0] text-white text-base font-semibold hover:bg-[#0A9A90] hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg shadow-[#0FBCB0]/20">
+              <button onClick={() => navigate("/signup")} className="px-8 py-4 rounded-xl bg-[#0FBCB0] text-white text-base font-semibold hover:bg-[#0A9A90] hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg shadow-[#0FBCB0]/20">
                 Get Started Free
               </button>
               <button onClick={() => scrollTo("how-it-works")} className="px-8 py-4 rounded-xl border border-white/30 text-white text-base font-medium hover:bg-white/5 transition-all flex items-center gap-2">
