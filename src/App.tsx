@@ -41,6 +41,7 @@ const App = () => (
           <Routes>
             {/* Public */}
             <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
             <Route path="/r/:slug/t/:token" element={<CustomerQR />} />
             <Route path="/r/:slug/t/:token/split" element={<CustomerSplit />} />
             <Route path="/r/:slug/t/:token/pay" element={<CustomerPay />} />
