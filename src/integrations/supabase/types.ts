@@ -522,23 +522,94 @@ export type Database = {
         }
         Relationships: []
       }
+      signup_requests: {
+        Row: {
+          admin_notes: string | null
+          city: string | null
+          contact_name: string
+          created_at: string | null
+          email: string
+          id: string
+          message: string | null
+          num_tables: number | null
+          phone: string
+          restaurant_id: string | null
+          restaurant_name: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          admin_notes?: string | null
+          city?: string | null
+          contact_name: string
+          created_at?: string | null
+          email: string
+          id?: string
+          message?: string | null
+          num_tables?: number | null
+          phone: string
+          restaurant_id?: string | null
+          restaurant_name: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          admin_notes?: string | null
+          city?: string | null
+          contact_name?: string
+          created_at?: string | null
+          email?: string
+          id?: string
+          message?: string | null
+          num_tables?: number | null
+          phone?: string
+          restaurant_id?: string | null
+          restaurant_name?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "signup_requests_restaurant_id_fkey"
+            columns: ["restaurant_id"]
+            isOneToOne: false
+            referencedRelation: "restaurants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       super_admins: {
         Row: {
           created_at: string | null
           email: string
           id: string
+          notification_email: string | null
+          notify_on_signup: boolean | null
           user_id: string
         }
         Insert: {
           created_at?: string | null
           email: string
           id?: string
+          notification_email?: string | null
+          notify_on_signup?: boolean | null
           user_id: string
         }
         Update: {
           created_at?: string | null
           email?: string
           id?: string
+          notification_email?: string | null
+          notify_on_signup?: boolean | null
           user_id?: string
         }
         Relationships: []
