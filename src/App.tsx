@@ -60,6 +60,7 @@ const App = () => (
               <Route path="/super-admin/restaurants/new" element={<SuperAdminRestaurantNew />} />
               <Route path="/super-admin/restaurants/:id" element={<SuperAdminRestaurantDetail />} />
               <Route path="/super-admin/restaurants/:id/tables" element={<SuperAdminRestaurantTables />} />
+              <Route path="/super-admin/requests" element={<SuperAdminRequests />} />
             </Route>
 
             {/* Protected dashboard with shared layout */}

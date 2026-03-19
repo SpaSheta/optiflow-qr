@@ -76,9 +76,15 @@ const Login = () => {
           </Button>
         </form>
 
-        <p className="mt-6 text-center text-[13px] text-muted-foreground">
-          Access is by invitation only.
-        </p>
+        <div className="mt-6 text-center">
+          <p className="text-[13px] text-muted-foreground mb-1">Want to join OptiFlow?</p>
+          <button
+            onClick={() => navigate("/signup")}
+            className="text-[13px] text-muted-foreground hover:text-primary font-medium transition-colors"
+          >
+            Request Access →
+          </button>
+        </div>
       </div>
     </div>
   );

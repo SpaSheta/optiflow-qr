@@ -91,7 +91,12 @@ const SuperAdminLayout = () => {
             )}
           >
             <item.icon className="h-4 w-4 shrink-0" />
-            <span>{item.label}</span>
+            <span className="flex-1 text-left">{item.label}</span>
+            {item.label === "Requests" && pendingCount > 0 && (
+              <span className="flex h-5 min-w-[20px] items-center justify-center rounded-full bg-red-500 px-1.5 text-[10px] font-bold text-white">
+                {pendingCount}
+              </span>
+            )}
           </button>
         ))}
       </nav>
