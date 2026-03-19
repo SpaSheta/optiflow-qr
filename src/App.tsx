@@ -24,8 +24,10 @@ import SuperAdminRestaurants from "@/pages/SuperAdminRestaurants";
 import SuperAdminRestaurantNew from "@/pages/SuperAdminRestaurantNew";
 import SuperAdminRestaurantDetail from "@/pages/SuperAdminRestaurantDetail";
 import SuperAdminRestaurantTables from "@/pages/SuperAdminRestaurantTables";
+import SuperAdminRequests from "@/pages/SuperAdminRequests";
 import NotFound from "@/pages/NotFound";
 import LandingPage from "@/pages/LandingPage";
+import Signup from "@/pages/Signup";
 
 const queryClient = new QueryClient();
 
@@ -39,6 +41,7 @@ const App = () => (
           <Routes>
             {/* Public */}
             <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
             <Route path="/r/:slug/t/:token" element={<CustomerQR />} />
             <Route path="/r/:slug/t/:token/split" element={<CustomerSplit />} />
             <Route path="/r/:slug/t/:token/pay" element={<CustomerPay />} />
@@ -57,6 +60,7 @@ const App = () => (
               <Route path="/super-admin/restaurants/new" element={<SuperAdminRestaurantNew />} />
               <Route path="/super-admin/restaurants/:id" element={<SuperAdminRestaurantDetail />} />
               <Route path="/super-admin/restaurants/:id/tables" element={<SuperAdminRestaurantTables />} />
+              <Route path="/super-admin/requests" element={<SuperAdminRequests />} />
             </Route>
 
             {/* Protected dashboard with shared layout */}

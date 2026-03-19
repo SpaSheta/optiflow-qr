@@ -73,7 +73,7 @@ const LandingPage = () => {
             <button onClick={() => scrollTo("for-restaurants")} className="text-sm text-white/70 hover:text-white transition">For Restaurants</button>
             <button onClick={() => scrollTo("how-it-works")} className="text-sm text-white/70 hover:text-white transition">How it works</button>
             <button onClick={() => navigate("/login")} className="text-sm px-5 py-2 rounded-xl border border-white/30 text-white hover:bg-white/10 transition">Sign In</button>
-            <button onClick={() => scrollTo("cta")} className="text-sm px-5 py-2 rounded-xl bg-[#0FBCB0] text-white font-semibold hover:bg-[#0A9A90] transition">Get Started</button>
+            <button onClick={() => navigate("/signup")} className="text-sm px-5 py-2 rounded-xl bg-[#0FBCB0] text-white font-semibold hover:bg-[#0A9A90] transition">Get Started</button>
           </div>
 
           {/* Mobile toggle */}
@@ -88,7 +88,7 @@ const LandingPage = () => {
             <button onClick={() => scrollTo("for-restaurants")} className="text-left text-white/80 py-2">For Restaurants</button>
             <button onClick={() => scrollTo("how-it-works")} className="text-left text-white/80 py-2">How it works</button>
             <button onClick={() => navigate("/login")} className="text-left text-white/80 py-2">Sign In</button>
-            <button onClick={() => scrollTo("cta")} className="w-full py-3 rounded-xl bg-[#0FBCB0] text-white font-semibold">Get Started</button>
+            <button onClick={() => navigate("/signup")} className="w-full py-3 rounded-xl bg-[#0FBCB0] text-white font-semibold">Get Started</button>
           </div>
         )}
       </nav>
@@ -121,7 +121,7 @@ const LandingPage = () => {
 
           <FadeUp delay={0.3}>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-10">
-              <button onClick={() => scrollTo("cta")} className="px-8 py-4 rounded-xl bg-[#0FBCB0] text-white text-base font-semibold hover:bg-[#0A9A90] hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg shadow-[#0FBCB0]/20">
+              <button onClick={() => navigate("/signup")} className="px-8 py-4 rounded-xl bg-[#0FBCB0] text-white text-base font-semibold hover:bg-[#0A9A90] hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg shadow-[#0FBCB0]/20">
                 Get Started Free
               </button>
               <button onClick={() => scrollTo("how-it-works")} className="px-8 py-4 rounded-xl border border-white/30 text-white text-base font-medium hover:bg-white/5 transition-all flex items-center gap-2">
@@ -437,7 +437,7 @@ const LandingPage = () => {
             </p>
           </FadeUp>
           <FadeUp delay={0.2}>
-            <button onClick={() => navigate("/login")} className="px-10 py-4 rounded-xl bg-[#0FBCB0] text-white text-lg font-semibold hover:bg-[#0A9A90] hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg shadow-[#0FBCB0]/25 mb-6">
+            <button onClick={() => navigate("/signup")} className="px-10 py-4 rounded-xl bg-[#0FBCB0] text-white text-lg font-semibold hover:bg-[#0A9A90] hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg shadow-[#0FBCB0]/25 mb-6">
               Get Started Today
             </button>
             <p className="text-sm text-white/40 flex items-center justify-center gap-2">

@@ -9,13 +9,15 @@ import {
   Menu,
   X,
   Zap,
+  Inbox,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 
 const NAV = [
   { label: "Overview", icon: LayoutGrid, path: "/super-admin" },
   { label: "Restaurants", icon: Store, path: "/super-admin/restaurants" },
+  { label: "Requests", icon: Inbox, path: "/super-admin/requests" },
 ];
 
 const SuperAdminLayout = () => {
@@ -23,6 +25,27 @@ const SuperAdminLayout = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [pendingCount, setPendingCount] = useState(0);
+
+  useEffect(() => {
+    const fetchPending = async () => {
+      const { count } = await supabase
+        .from("signup_requests")
+        .select("id", { count: "exact", head: true })
+        .eq("status", "pending");
+      setPendingCount(count || 0);
+    };
+    fetchPending();
+
+    const channel = supabase
+      .channel("sidebar-signups")
+      .on("postgres_changes", { event: "*", schema: "public", table: "signup_requests" }, () => {
+        fetchPending();
+      })
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
+  }, []);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -68,7 +91,12 @@ const SuperAdminLayout = () => {
             )}
           >
             <item.icon className="h-4 w-4 shrink-0" />
-            <span>{item.label}</span>
+            <span className="flex-1 text-left">{item.label}</span>
+            {item.label === "Requests" && pendingCount > 0 && (
+              <span className="flex h-5 min-w-[20px] items-center justify-center rounded-full bg-red-500 px-1.5 text-[10px] font-bold text-white">
+                {pendingCount}
+              </span>
+            )}
           </button>
         ))}
       </nav>
