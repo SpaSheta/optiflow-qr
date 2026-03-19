@@ -88,7 +88,7 @@ const LandingPage = () => {
             <button onClick={() => scrollTo("for-restaurants")} className="text-left text-white/80 py-2">For Restaurants</button>
             <button onClick={() => scrollTo("how-it-works")} className="text-left text-white/80 py-2">How it works</button>
             <button onClick={() => navigate("/login")} className="text-left text-white/80 py-2">Sign In</button>
-            <button onClick={() => scrollTo("cta")} className="w-full py-3 rounded-xl bg-[#0FBCB0] text-white font-semibold">Get Started</button>
+            <button onClick={() => navigate("/signup")} className="w-full py-3 rounded-xl bg-[#0FBCB0] text-white font-semibold">Get Started</button>
           </div>
         )}
       </nav>
