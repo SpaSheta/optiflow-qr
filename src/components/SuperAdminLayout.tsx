@@ -9,13 +9,15 @@ import {
   Menu,
   X,
   Zap,
+  Inbox,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 
 const NAV = [
   { label: "Overview", icon: LayoutGrid, path: "/super-admin" },
   { label: "Restaurants", icon: Store, path: "/super-admin/restaurants" },
+  { label: "Requests", icon: Inbox, path: "/super-admin/requests" },
 ];
 
 const SuperAdminLayout = () => {
