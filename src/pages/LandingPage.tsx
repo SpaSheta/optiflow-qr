@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Check, X, QrCode, Users, CreditCard, Menu, ChevronDown, MessageCircle } from "lucide-react";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 import optiflowLogo from "@/assets/optiflow-icon.png";
 
 /* ── Intersection Observer hook ── */
@@ -40,6 +42,7 @@ function FadeUp({ children, className = "", delay = 0 }: { children: React.React
 /* ── Landing page ── */
 const LandingPage = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -53,6 +56,14 @@ const LandingPage = () => {
     setMobileOpen(false);
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
   };
+
+  const icons = [<QrCode className="h-6 w-6" />, <Users className="h-6 w-6" />, <CreditCard className="h-6 w-6" />];
+
+  const problemSteps = t("landing.problem.steps", { returnObjects: true }) as { emoji: string; step: string; time: string }[];
+  const howSteps = t("landing.howItWorks.steps", { returnObjects: true }) as { num: string; title: string; body: string }[];
+  const compFeatures = t("landing.comparison.features", { returnObjects: true }) as string[];
+  const featureCards = t("landing.featureCards", { returnObjects: true }) as { title: string; body: string }[];
+  const dashFeatures = t("landing.dashboard.features", { returnObjects: true }) as string[];
 
   return (
     <div className="min-h-screen" style={{ fontFamily: "'Inter', 'DM Sans', sans-serif", scrollBehavior: "smooth" }}>
@@ -70,10 +81,11 @@ const LandingPage = () => {
 
           {/* Desktop */}
           <div className="hidden md:flex items-center gap-6">
-            <button onClick={() => scrollTo("for-restaurants")} className="text-sm text-white/70 hover:text-white transition">For Restaurants</button>
-            <button onClick={() => scrollTo("how-it-works")} className="text-sm text-white/70 hover:text-white transition">How it works</button>
-            <button onClick={() => navigate("/login")} className="text-sm px-5 py-2 rounded-xl border border-white/30 text-white hover:bg-white/10 transition">Sign In</button>
-            <button onClick={() => navigate("/signup")} className="text-sm px-5 py-2 rounded-xl bg-[#0FBCB0] text-white font-semibold hover:bg-[#0A9A90] transition">Get Started</button>
+            <button onClick={() => scrollTo("for-restaurants")} className="text-sm text-white/70 hover:text-white transition">{t("landing.nav.forRestaurants")}</button>
+            <button onClick={() => scrollTo("how-it-works")} className="text-sm text-white/70 hover:text-white transition">{t("landing.nav.howItWorks")}</button>
+            <LanguageSwitcher variant="ghost" />
+            <button onClick={() => navigate("/login")} className="text-sm px-5 py-2 rounded-xl border border-white/30 text-white hover:bg-white/10 transition">{t("landing.nav.signIn")}</button>
+            <button onClick={() => navigate("/signup")} className="text-sm px-5 py-2 rounded-xl bg-[#0FBCB0] text-white font-semibold hover:bg-[#0A9A90] transition">{t("landing.nav.getStarted")}</button>
           </div>
 
           {/* Mobile toggle */}
@@ -85,54 +97,52 @@ const LandingPage = () => {
         {/* Mobile menu */}
         {mobileOpen && (
           <div className="md:hidden bg-[#0F172A]/95 backdrop-blur-xl border-t border-white/10 px-6 pb-6 flex flex-col gap-4">
-            <button onClick={() => scrollTo("for-restaurants")} className="text-left text-white/80 py-2">For Restaurants</button>
-            <button onClick={() => scrollTo("how-it-works")} className="text-left text-white/80 py-2">How it works</button>
-            <button onClick={() => navigate("/login")} className="text-left text-white/80 py-2">Sign In</button>
-            <button onClick={() => navigate("/signup")} className="w-full py-3 rounded-xl bg-[#0FBCB0] text-white font-semibold">Get Started</button>
+            <button onClick={() => scrollTo("for-restaurants")} className="text-left text-white/80 py-2">{t("landing.nav.forRestaurants")}</button>
+            <button onClick={() => scrollTo("how-it-works")} className="text-left text-white/80 py-2">{t("landing.nav.howItWorks")}</button>
+            <button onClick={() => navigate("/login")} className="text-left text-white/80 py-2">{t("landing.nav.signIn")}</button>
+            <button onClick={() => navigate("/signup")} className="w-full py-3 rounded-xl bg-[#0FBCB0] text-white font-semibold">{t("landing.nav.getStarted")}</button>
+            <LanguageSwitcher variant="ghost" />
           </div>
         )}
       </nav>
 
       {/* ━━ HERO ━━ */}
       <section className="relative bg-[#0F172A] pt-32 pb-24 md:pt-40 md:pb-32 overflow-hidden">
-        {/* Subtle grid overlay */}
         <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%23fff' stroke-width='1'%3E%3Cpath d='M0 0h60v60'/%3E%3C/g%3E%3C/svg%3E\")" }} />
 
         <div className="relative mx-auto max-w-4xl px-6 text-center">
           <FadeUp>
             <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold bg-[#0FBCB0]/15 text-[#0FBCB0] border border-[#0FBCB0]/20 mb-8">
-              ✦ Built for Kurdistan's restaurants
+              {t("landing.hero.badge")}
             </span>
           </FadeUp>
 
           <FadeUp delay={0.1}>
-            <h1 className="text-4xl sm:text-5xl md:text-[64px] text-white leading-[1.1] mb-6" style={{ fontWeight: 800, letterSpacing: "-0.03em" }}>
-              Stop losing customers<br />to long bill waits.
+            <h1 className="text-4xl sm:text-5xl md:text-[64px] text-white leading-[1.1] mb-6 whitespace-pre-line" style={{ fontWeight: 800, letterSpacing: "-0.03em" }}>
+              {t("landing.hero.title")}
             </h1>
           </FadeUp>
 
           <FadeUp delay={0.2}>
             <p className="text-lg md:text-xl text-white/60 max-w-2xl mx-auto mb-10 leading-relaxed" style={{ fontWeight: 400 }}>
-              OptiFlow gives every table a live digital receipt.
-              Customers scan a QR code, split the bill, and pay
-              in under 2 minutes — no app download needed.
+              {t("landing.hero.subtitle")}
             </p>
           </FadeUp>
 
           <FadeUp delay={0.3}>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-10">
               <button onClick={() => navigate("/signup")} className="px-8 py-4 rounded-xl bg-[#0FBCB0] text-white text-base font-semibold hover:bg-[#0A9A90] hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg shadow-[#0FBCB0]/20">
-                Get Started Free
+                {t("landing.hero.cta")}
               </button>
               <button onClick={() => scrollTo("how-it-works")} className="px-8 py-4 rounded-xl border border-white/30 text-white text-base font-medium hover:bg-white/5 transition-all flex items-center gap-2">
-                See How It Works <ChevronDown className="h-4 w-4" />
+                {t("landing.hero.seeHow")} <ChevronDown className="h-4 w-4" />
               </button>
             </div>
           </FadeUp>
 
           <FadeUp delay={0.4}>
             <p className="text-sm text-white/30 mb-16">
-              Trusted by restaurants in Erbil · Garden Avenue · Derwaza Corniche
+              {t("landing.hero.trusted")}
             </p>
           </FadeUp>
 
@@ -141,14 +151,13 @@ const LandingPage = () => {
             <div className="relative mx-auto w-[260px] sm:w-[280px]" style={{ animation: "float 6s ease-in-out infinite" }}>
               <div className="rounded-[36px] border-[6px] border-white/10 bg-[#1E293B] p-3 shadow-2xl shadow-black/40">
                 <div className="rounded-[28px] bg-white overflow-hidden">
-                  {/* Simplified bill mockup */}
                   <div className="p-5">
                     <div className="flex items-center justify-center mb-4">
                       <img src={optiflowLogo} alt="Logo" className="h-10 w-10 rounded-lg" />
                     </div>
                     <div className="text-center mb-4">
                       <div className="text-sm font-bold text-[#0F172A]">Garden Avenue</div>
-                      <div className="text-[10px] text-[#64748B]">Table 5 · Live Bill</div>
+                      <div className="text-[10px] text-[#64748B]">{t("common.table")} 5 · {t("landing.mockBill.liveBill")}</div>
                     </div>
                     <div className="space-y-2 mb-4">
                       {[["Grilled Chicken", "12,500"], ["Caesar Salad", "8,000"], ["Fresh Juice x2", "6,000"]].map(([n, p]) => (
@@ -159,10 +168,10 @@ const LandingPage = () => {
                       ))}
                     </div>
                     <div className="border-t border-[#E2E8F0] pt-3 flex justify-between text-xs font-bold text-[#0F172A]">
-                      <span>Total</span><span>26,500 IQD</span>
+                      <span>{t("landing.mockBill.total")}</span><span>26,500 IQD</span>
                     </div>
                     <div className="mt-4 py-2.5 rounded-lg bg-[#0FBCB0] text-white text-center text-xs font-semibold">
-                      Pay Now
+                      {t("landing.mockBill.payNow")}
                     </div>
                   </div>
                 </div>
@@ -179,25 +188,17 @@ const LandingPage = () => {
             <FadeUp>
               <div>
                 <h2 className="text-3xl md:text-4xl text-[#0F172A] mb-4" style={{ fontWeight: 800, letterSpacing: "-0.03em" }}>
-                  The bill process is broken.
+                  {t("landing.problem.title")}
                 </h2>
                 <p className="text-lg text-[#64748B] leading-relaxed">
-                  Every restaurant in Kurdistan loses time and money
-                  to the same broken checkout experience.
+                  {t("landing.problem.subtitle")}
                 </p>
               </div>
             </FadeUp>
 
             <FadeUp delay={0.15}>
               <div className="space-y-0">
-                {[
-                  { emoji: "🙋", step: "Customer asks for bill", time: "1 min" },
-                  { emoji: "🚶", step: "Waiter goes to cashier", time: "3 min" },
-                  { emoji: "🖨️", step: "Cashier prints receipt", time: "2 min" },
-                  { emoji: "🚶", step: "Waiter returns", time: "3 min" },
-                  { emoji: "🧮", step: "Group calculates split", time: "5 min" },
-                  { emoji: "💸", step: "Waiter collects, goes back", time: "5 min" },
-                ].map((s, i) => (
+                {Array.isArray(problemSteps) && problemSteps.map((s, i) => (
                   <div key={i} className="flex items-center gap-4 py-3 border-b border-[#F1F5F9] last:border-0">
                     <span className="text-lg w-8">{s.emoji}</span>
                     <div className="h-6 w-px bg-[#E2E8F0]" />
@@ -207,8 +208,8 @@ const LandingPage = () => {
                 ))}
 
                 <div className="pt-6 text-center">
-                  <p className="text-xl font-bold text-[#EF4444]">Up to 30 minutes. Every. Single. Table.</p>
-                  <p className="mt-2 text-lg font-bold text-[#0FBCB0]">With OptiFlow: under 2 minutes.</p>
+                  <p className="text-xl font-bold text-[#EF4444]">{t("landing.problem.oldTime")}</p>
+                  <p className="mt-2 text-lg font-bold text-[#0FBCB0]">{t("landing.problem.newTime")}</p>
                 </div>
               </div>
             </FadeUp>
@@ -222,33 +223,20 @@ const LandingPage = () => {
           <FadeUp>
             <div className="text-center mb-16">
               <h2 className="text-3xl md:text-4xl text-[#0F172A] mb-3" style={{ fontWeight: 800, letterSpacing: "-0.03em" }}>
-                How OptiFlow works
+                {t("landing.howItWorks.title")}
               </h2>
-              <p className="text-lg text-[#64748B]">Three steps. Zero friction.</p>
+              <p className="text-lg text-[#64748B]">{t("landing.howItWorks.subtitle")}</p>
             </div>
           </FadeUp>
 
           <div className="grid md:grid-cols-3 gap-6">
-            {[
-              {
-                num: "01", icon: <QrCode className="h-6 w-6" />, title: "Customer scans the table",
-                body: "Every table has a QR code and NFC tag. One tap or scan opens the live receipt instantly — no app download needed.",
-              },
-              {
-                num: "02", icon: <Users className="h-6 w-6" />, title: "Split the bill in seconds",
-                body: "Each person picks their items, or splits equally. The math is done automatically. Tax divided fairly. No awkward calculations.",
-              },
-              {
-                num: "03", icon: <CreditCard className="h-6 w-6" />, title: "Pay and go",
-                body: "Pay with FIB Pay instantly or request cash. Digital receipt sent automatically. Table cleared faster for the next guests.",
-              },
-            ].map((c, i) => (
+            {Array.isArray(howSteps) && howSteps.map((c, i) => (
               <FadeUp key={i} delay={i * 0.12}>
                 <div className="bg-white rounded-2xl border border-[#E2E8F0] p-8 h-full hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
                   <div className="flex items-start justify-between mb-6">
                     <span className="text-5xl font-extrabold text-[#0FBCB0]/15">{c.num}</span>
                     <div className="h-12 w-12 rounded-xl bg-[#0FBCB0]/10 flex items-center justify-center text-[#0FBCB0]">
-                      {c.icon}
+                      {icons[i]}
                     </div>
                   </div>
                   <h3 className="text-lg text-[#0F172A] mb-3" style={{ fontWeight: 700 }}>{c.title}</h3>
@@ -266,11 +254,10 @@ const LandingPage = () => {
           <FadeUp>
             <div className="text-center mb-16">
               <h2 className="text-3xl md:text-4xl text-white mb-3" style={{ fontWeight: 800, letterSpacing: "-0.03em" }}>
-                Built different. Built better.
+                {t("landing.comparison.title")}
               </h2>
               <p className="text-lg text-white/50 max-w-2xl mx-auto">
-                We didn't copy a western product and drop it in Kurdistan.
-                We built OptiFlow from scratch for this market.
+                {t("landing.comparison.subtitle")}
               </p>
             </div>
           </FadeUp>
@@ -279,16 +266,11 @@ const LandingPage = () => {
           <FadeUp delay={0.1}>
             <div className="max-w-2xl mx-auto mb-16 rounded-2xl overflow-hidden border border-white/10">
               <div className="grid grid-cols-3 text-sm">
-                {/* Header */}
                 <div className="p-4 bg-white/5" />
-                <div className="p-4 bg-white/5 text-center text-white/50 font-semibold">Others</div>
+                <div className="p-4 bg-white/5 text-center text-white/50 font-semibold">{t("landing.comparison.others")}</div>
                 <div className="p-4 bg-[#0FBCB0]/15 text-center text-[#0FBCB0] font-bold">OptiFlow</div>
 
-                {[
-                  "No app download", "Works with your POS", "FIB Pay built-in",
-                  "Kurdish market focus", "Custom branding", "NFC + QR support",
-                  "Bill splitting", "Works without internet",
-                ].map((f, i) => (
+                {Array.isArray(compFeatures) && compFeatures.map((f, i) => (
                   <div key={i} className="contents">
                     <div className={`px-4 py-3 text-white/70 text-sm border-t border-white/5 ${i % 2 === 0 ? "bg-white/[0.02]" : ""}`}>{f}</div>
                     <div className={`px-4 py-3 text-center border-t border-white/5 ${i % 2 === 0 ? "bg-white/[0.02]" : ""}`}>
@@ -305,20 +287,7 @@ const LandingPage = () => {
 
           {/* Feature cards */}
           <div className="grid md:grid-cols-3 gap-6">
-            {[
-              {
-                title: "Optimized for Kurdistan",
-                body: "FIB Pay, IQD currency, Arabic and Kurdish support coming. Designed for how restaurants here actually work.",
-              },
-              {
-                title: "Zero disruption to your POS",
-                body: "We never touch your existing system. OptiFlow sits alongside it as a live receipt mirror layer.",
-              },
-              {
-                title: "Your brand, your experience",
-                body: "Every customer page looks like YOUR restaurant, not OptiFlow. Custom colors, logo, intro video.",
-              },
-            ].map((c, i) => (
+            {Array.isArray(featureCards) && featureCards.map((c, i) => (
               <FadeUp key={i} delay={i * 0.1}>
                 <div className="rounded-2xl border border-white/10 bg-white/5 p-7 hover:bg-white/[0.08] transition-colors">
                   <h3 className="text-white text-lg mb-2" style={{ fontWeight: 700 }}>{c.title}</h3>
@@ -337,22 +306,13 @@ const LandingPage = () => {
             <FadeUp>
               <div>
                 <h2 className="text-3xl md:text-4xl text-[#0F172A] mb-4" style={{ fontWeight: 800, letterSpacing: "-0.03em" }}>
-                  A dashboard that gives you full control
+                  {t("landing.dashboard.title")}
                 </h2>
                 <p className="text-lg text-[#64748B] mb-8 leading-relaxed">
-                  Manage your menu, tables, and live bills in one place.
-                  Watch payments come in from any device.
-                  Set up your branding in minutes.
+                  {t("landing.dashboard.subtitle")}
                 </p>
                 <ul className="space-y-3">
-                  {[
-                    "Live bill management for every table",
-                    "Full menu management with photos",
-                    "Custom branding and theme",
-                    "QR + NFC code generation",
-                    "Real-time payment tracking",
-                    "Analytics and insights",
-                  ].map((f, i) => (
+                  {Array.isArray(dashFeatures) && dashFeatures.map((f, i) => (
                     <li key={i} className="flex items-center gap-3 text-sm text-[#374151]">
                       <div className="h-5 w-5 rounded-full bg-[#0FBCB0]/10 flex items-center justify-center flex-shrink-0">
                         <Check className="h-3 w-3 text-[#0FBCB0]" />
@@ -366,7 +326,6 @@ const LandingPage = () => {
 
             <FadeUp delay={0.2}>
               <div className="rounded-2xl border border-[#E2E8F0] bg-[#F8FAFC] p-6 shadow-lg">
-                {/* Dashboard mockup */}
                 <div className="rounded-xl bg-white border border-[#E2E8F0] overflow-hidden">
                   <div className="flex items-center gap-2 px-4 py-3 border-b border-[#F1F5F9]">
                     <div className="h-3 w-3 rounded-full bg-[#EF4444]/40" />
@@ -376,7 +335,7 @@ const LandingPage = () => {
                   </div>
                   <div className="p-4">
                     <div className="grid grid-cols-3 gap-3 mb-4">
-                      {[["Tables", "12"], ["Open Bills", "5"], ["Revenue", "1.2M"]].map(([l, v]) => (
+                      {[[t("common.tables"), "12"], [t("dashboard.openBills"), "5"], [t("dashboard.todayRevenue"), "1.2M"]].map(([l, v]) => (
                         <div key={l} className="rounded-lg bg-[#F8FAFC] border border-[#E2E8F0] p-3 text-center">
                           <div className="text-[10px] text-[#94A3B8] uppercase tracking-wider mb-1">{l}</div>
                           <div className="text-lg font-extrabold text-[#0F172A]">{v}</div>
@@ -385,12 +344,12 @@ const LandingPage = () => {
                     </div>
                     <div className="space-y-2">
                       {[
-                        { t: "Table 3", s: "Open", c: "#10B981" },
-                        { t: "Table 7", s: "Paid", c: "#2563EB" },
-                        { t: "Table 1", s: "Pending", c: "#D97706" },
+                        { tbl: `${t("common.table")} 3`, s: t("dashboard.openBill"), c: "#10B981" },
+                        { tbl: `${t("common.table")} 7`, s: t("dashboard.empty"), c: "#2563EB" },
+                        { tbl: `${t("common.table")} 1`, s: t("dashboard.needsAttention"), c: "#D97706" },
                       ].map((r) => (
-                        <div key={r.t} className="flex items-center justify-between rounded-lg bg-[#F8FAFC] px-3 py-2">
-                          <span className="text-xs font-semibold text-[#374151]">{r.t}</span>
+                        <div key={r.tbl} className="flex items-center justify-between rounded-lg bg-[#F8FAFC] px-3 py-2">
+                          <span className="text-xs font-semibold text-[#374151]">{r.tbl}</span>
                           <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full" style={{ color: r.c, background: `${r.c}15` }}>{r.s}</span>
                         </div>
                       ))}
@@ -408,9 +367,9 @@ const LandingPage = () => {
         <div className="mx-auto max-w-5xl px-6">
           <div className="grid grid-cols-3 gap-8 text-center">
             {[
-              { stat: "30 → 2 min", label: "Bill settlement time" },
-              { stat: "0 apps", label: "Customer downloads" },
-              { stat: "100%", label: "Table coverage" },
+              { stat: "30 → 2 min", label: t("landing.stats.billTime") },
+              { stat: "0 apps", label: t("landing.stats.downloads") },
+              { stat: "100%", label: t("landing.stats.coverage") },
             ].map((s, i) => (
               <FadeUp key={i} delay={i * 0.1}>
                 <div>
@@ -428,21 +387,21 @@ const LandingPage = () => {
         <div className="mx-auto max-w-3xl px-6 text-center">
           <FadeUp>
             <h2 className="text-3xl md:text-4xl text-white mb-4" style={{ fontWeight: 800, letterSpacing: "-0.03em" }}>
-              Ready to optimize your restaurant's flow?
+              {t("landing.cta.title")}
             </h2>
           </FadeUp>
           <FadeUp delay={0.1}>
             <p className="text-lg text-white/50 mb-10">
-              Join the restaurants in Erbil already using OptiFlow.
+              {t("landing.cta.subtitle")}
             </p>
           </FadeUp>
           <FadeUp delay={0.2}>
             <button onClick={() => navigate("/signup")} className="px-10 py-4 rounded-xl bg-[#0FBCB0] text-white text-lg font-semibold hover:bg-[#0A9A90] hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg shadow-[#0FBCB0]/25 mb-6">
-              Get Started Today
+              {t("landing.cta.button")}
             </button>
             <p className="text-sm text-white/40 flex items-center justify-center gap-2">
               <MessageCircle className="h-4 w-4" />
-              Questions? Contact us on WhatsApp
+              {t("landing.cta.whatsapp")}
             </p>
           </FadeUp>
         </div>
@@ -454,13 +413,13 @@ const LandingPage = () => {
           <div className="grid md:grid-cols-3 gap-10 items-start mb-10">
             <div>
               <span className="text-white text-xl" style={{ fontWeight: 800 }}>OptiFlow</span>
-              <p className="text-sm text-white/40 mt-2">Optimizing the flow of your restaurant.</p>
+              <p className="text-sm text-white/40 mt-2">{t("landing.footer.tagline")}</p>
             </div>
             <div className="flex flex-wrap gap-6 text-sm text-white/50 md:justify-center">
-              <button onClick={() => scrollTo("hero")} className="hover:text-white transition">Home</button>
-              <button onClick={() => scrollTo("how-it-works")} className="hover:text-white transition">How it works</button>
-              <button onClick={() => scrollTo("for-restaurants")} className="hover:text-white transition">For Restaurants</button>
-              <button onClick={() => navigate("/login")} className="hover:text-white transition">Sign In</button>
+              <button onClick={() => scrollTo("hero")} className="hover:text-white transition">{t("landing.footer.home")}</button>
+              <button onClick={() => scrollTo("how-it-works")} className="hover:text-white transition">{t("landing.nav.howItWorks")}</button>
+              <button onClick={() => scrollTo("for-restaurants")} className="hover:text-white transition">{t("landing.nav.forRestaurants")}</button>
+              <button onClick={() => navigate("/login")} className="hover:text-white transition">{t("landing.nav.signIn")}</button>
             </div>
             <div className="flex gap-4 md:justify-end">
               <a href="#" className="h-9 w-9 rounded-lg bg-white/5 flex items-center justify-center text-white/50 hover:text-white hover:bg-white/10 transition" aria-label="Instagram">
@@ -472,12 +431,11 @@ const LandingPage = () => {
             </div>
           </div>
           <div className="border-t border-white/5 pt-6 text-center text-xs text-white/30">
-            © 2026 OptiFlow. Built in Kurdistan.
+            {t("landing.footer.copyright")}
           </div>
         </div>
       </footer>
 
-      {/* Float animation keyframes */}
       <style>{`
         @keyframes float {
           0%, 100% { transform: translateY(0); }
