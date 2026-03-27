@@ -13,11 +13,13 @@ import {
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "react-i18next";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 
-const NAV = [
-  { label: "Overview", icon: LayoutGrid, path: "/super-admin" },
-  { label: "Restaurants", icon: Store, path: "/super-admin/restaurants" },
-  { label: "Requests", icon: Inbox, path: "/super-admin/requests" },
+const getNav = (t: any) => [
+  { label: t("superAdmin.overview"), icon: LayoutGrid, path: "/super-admin" },
+  { label: t("superAdmin.restaurants"), icon: Store, path: "/super-admin/restaurants" },
+  { label: t("superAdmin.requests"), icon: Inbox, path: "/super-admin/requests" },
 ];
 
 const SuperAdminLayout = () => {
@@ -25,6 +27,8 @@ const SuperAdminLayout = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { t } = useTranslation();
+  const NAV = getNav(t);
   const [pendingCount, setPendingCount] = useState(0);
 
   useEffect(() => {
@@ -73,7 +77,7 @@ const SuperAdminLayout = () => {
 
       <div className="px-5 py-2">
         <span className="badge-pending text-[10px] font-bold uppercase tracking-wider">
-          Super Admin
+          {t("superAdmin.label")}
         </span>
       </div>
 
@@ -109,15 +113,18 @@ const SuperAdminLayout = () => {
           </div>
           <div className="min-w-0 flex-1">
             <p className="truncate text-xs font-medium text-white/80">{user?.email}</p>
-            <p className="text-[10px] text-warning">Super Admin</p>
+            <p className="text-[10px] text-warning">{t("superAdmin.label")}</p>
           </div>
+        </div>
+        <div className="mb-2 px-3">
+          <LanguageSwitcher variant="ghost" />
         </div>
         <button
           onClick={handleLogout}
           className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-white/60 hover:bg-white/5 hover:text-white/80"
         >
           <LogOut className="h-4 w-4 shrink-0" />
-          <span>Sign Out</span>
+          <span>{t("common.signOut")}</span>
         </button>
       </div>
     </div>

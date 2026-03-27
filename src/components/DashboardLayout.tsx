@@ -15,13 +15,15 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "react-i18next";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 
-const NAV = [
-  { label: "Overview", icon: LayoutGrid, path: "/dashboard" },
-  { label: "Tables", icon: TableProperties, path: "/dashboard/tables", showBadge: true },
-  { label: "Menu", icon: UtensilsCrossed, path: "/dashboard/menu" },
-  { label: "Theme", icon: Palette, path: "/dashboard/theme" },
-  { label: "Settings", icon: Settings, path: "/dashboard/settings" },
+const getNav = (t: any) => [
+  { label: t("dashboard.overview"), icon: LayoutGrid, path: "/dashboard" },
+  { label: t("dashboard.tables"), icon: TableProperties, path: "/dashboard/tables", showBadge: true },
+  { label: t("dashboard.menu"), icon: UtensilsCrossed, path: "/dashboard/menu" },
+  { label: t("dashboard.theme"), icon: Palette, path: "/dashboard/theme" },
+  { label: t("dashboard.settings"), icon: Settings, path: "/dashboard/settings" },
 ];
 
 const DashboardLayout = () => {
@@ -30,6 +32,8 @@ const DashboardLayout = () => {
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
   const pendingCashCount = usePendingCashCount();
+  const { t } = useTranslation();
+  const NAV = getNav(t);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -89,12 +93,15 @@ const DashboardLayout = () => {
         <p className="mb-2 truncate px-3 text-label text-white/50">
           {restaurant?.name}
         </p>
+        <div className="mb-2 px-3">
+          <LanguageSwitcher variant="ghost" />
+        </div>
         <button
           onClick={handleLogout}
           className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-white/70 hover:bg-white/5"
         >
           <LogOut className="h-4 w-4 shrink-0" />
-          <span>Sign Out</span>
+          <span>{t("common.signOut")}</span>
         </button>
       </div>
     </div>
