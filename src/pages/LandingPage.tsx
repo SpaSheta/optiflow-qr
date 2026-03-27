@@ -83,7 +83,7 @@ const LandingPage = () => {
           <div className="hidden md:flex items-center gap-6">
             <button onClick={() => scrollTo("for-restaurants")} className="text-sm text-white/70 hover:text-white transition">{t("landing.nav.forRestaurants")}</button>
             <button onClick={() => scrollTo("how-it-works")} className="text-sm text-white/70 hover:text-white transition">{t("landing.nav.howItWorks")}</button>
-            <LanguageSwitcher variant="landing" />
+            <LanguageSwitcher variant="ghost" />
             <button onClick={() => navigate("/login")} className="text-sm px-5 py-2 rounded-xl border border-white/30 text-white hover:bg-white/10 transition">{t("landing.nav.signIn")}</button>
             <button onClick={() => navigate("/signup")} className="text-sm px-5 py-2 rounded-xl bg-[#0FBCB0] text-white font-semibold hover:bg-[#0A9A90] transition">{t("landing.nav.getStarted")}</button>
           </div>
@@ -101,7 +101,7 @@ const LandingPage = () => {
             <button onClick={() => scrollTo("how-it-works")} className="text-left text-white/80 py-2">{t("landing.nav.howItWorks")}</button>
             <button onClick={() => navigate("/login")} className="text-left text-white/80 py-2">{t("landing.nav.signIn")}</button>
             <button onClick={() => navigate("/signup")} className="w-full py-3 rounded-xl bg-[#0FBCB0] text-white font-semibold">{t("landing.nav.getStarted")}</button>
-            <LanguageSwitcher variant="landing" />
+            <LanguageSwitcher variant="ghost" />
           </div>
         )}
       </nav>
